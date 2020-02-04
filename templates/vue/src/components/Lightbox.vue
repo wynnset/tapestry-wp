@@ -203,6 +203,24 @@ export default {
     background-color: black;
     box-shadow: 0 0 100px -40px #000;
     border-radius: 15px;
+    scrollbar-color: rgba(0,0,0,.5) rgba(255,255,255,.5) ;
+    scrollbar-width: auto;
+    -ms-overflow-style:scrollbar;
+
+    ::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: rgba(0,0,0,.5);
+      box-shadow: 0 0 1px rgba(255,255,255,.5);
+    }
+
+    ::-webkit-scrollbar-corner {
+      display: none;
+    }
 
     &.content-text {
       outline: none;
