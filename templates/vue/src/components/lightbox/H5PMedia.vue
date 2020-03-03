@@ -20,10 +20,9 @@
       :autoplay="autoplay"
       :node="node"
       :width="width"
-      :height="height"
       :settings="settings"
       @complete="$emit('complete')"
-      @is-loaded="isLoading = false"
+      @is-loaded="handleLoad"
       @show-end-screen="showEndScreen = true"
     />
   </div>
@@ -77,6 +76,10 @@ export default {
     }
   },
   methods: {
+    handleLoad() {
+      this.isLoading = false
+      this.$emit("load")
+    },
     openQuiz() {
       this.showEndScreen = false
       this.showQuizScreen = true
@@ -109,5 +112,7 @@ export default {
   height: 100%;
   max-width: 100vw;
   padding: 0;
+  border-radius: 15px;
+  overflow: hidden;
 }
 </style>

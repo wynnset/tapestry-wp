@@ -58,6 +58,9 @@ export default {
 <style lang="scss" scoped>
 .external-media-container {
   height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  background: white;
 }
 
 .preview {

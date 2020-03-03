@@ -1,5 +1,32 @@
 <template>
-  <div ref="container" class="media-container">
+  <div ref="container" class="media-container" @scroll="handleScroll">
+    <scrollbar
+      :scroll-height="scrollHeight"
+      :scroll-top="scrollTop"
+      :client-height="clientHeight"
+      @scrollchange="handleScrollDrag"
+    />
+    <tapestry-modal
+      v-if="showCompletion"
+      :allow-close="false"
+      @close="showCompletion = false"
+    >
+      <h1>{{ node.typeData.confirmationTitleText }}</h1>
+      <p>{{ node.typeData.confirmationBodyText }}</p>
+      <div class="button-container">
+        <button class="button-completion" @click="$emit('close')">
+          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
+          <p>{{ node.typeData.continueButtonText }}</p>
+        </button>
+        <button class="button-completion" @click="showCompletion = false">
+          <i class="far fa-times-circle fa-4x"></i>
+          <p>{{ node.typeData.cancelLinkText }}</p>
+        </button>
+      </div>
+    </tapestry-modal>
+    <button class="button-scroll-top" @click="scrollToTop">
+      <i class="fas fa-chevron-up fa-2x"></i>
+    </button>
     <h1 class="title">{{ node.title }}</h1>
     <accordion-row
       v-for="(row, index) in rows"
@@ -23,6 +50,7 @@
           :autoplay="false"
           @complete="updateProgress(row.id)"
           @close="toggle(index)"
+          @load="updateScrollValues"
         />
       </template>
       <template v-slot:footer>
@@ -31,27 +59,6 @@
         </button>
       </template>
     </accordion-row>
-    <tapestry-modal
-      v-if="showCompletion"
-      :allow-close="false"
-      @close="showCompletion = false"
-    >
-      <h1>{{ node.typeData.confirmationTitleText }}</h1>
-      <p>{{ node.typeData.confirmationBodyText }}</p>
-      <div class="button-container">
-        <button class="button-completion" @click="$emit('close')">
-          <i class="far fa-arrow-alt-circle-right fa-4x"></i>
-          <p>{{ node.typeData.continueButtonText }}</p>
-        </button>
-        <button class="button-completion" @click="showCompletion = false">
-          <i class="far fa-times-circle fa-4x"></i>
-          <p>{{ node.typeData.cancelLinkText }}</p>
-        </button>
-      </div>
-    </tapestry-modal>
-    <button class="button-scroll-top" @click="scrollToTop">
-      <i class="fas fa-chevron-up fa-2x"></i>
-    </button>
   </div>
 </template>
 
@@ -60,6 +67,7 @@ import { mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import TapestryModal from "../TapestryModal"
 import AccordionRow from "../AccordionRow"
+import Scrollbar from "../Scrollbar"
 
 export default {
   name: "accordion-media",
@@ -67,6 +75,7 @@ export default {
     TapestryMedia,
     TapestryModal,
     AccordionRow,
+    Scrollbar,
   },
   props: {
     node: {
@@ -79,6 +88,9 @@ export default {
       activeIndex: 0,
       showCompletion: false,
       isMounted: false,
+      scrollHeight: 0,
+      scrollTop: 0,
+      clientHeight: 0,
     }
   },
   computed: {
@@ -107,9 +119,37 @@ export default {
       return this.rows.findIndex(node => !node.completed)
     },
   },
+  mounted() {
+    this.isMounted = true
+    this.updateScrollValues()
+  },
+  updated() {
+    this.updateScrollValues()
+  },
   methods: {
     ...mapMutations(["updateNode"]),
     ...mapActions(["completeNode", "updateNodeProgress"]),
+    handleScrollDrag(evt) {
+      const container = this.$refs.container.getBoundingClientRect()
+      const offset = (evt - container.top) / this.clientHeight
+      let newValue = offset * this.$refs.container.scrollTopMax
+      if (newValue < 0) {
+        newValue = 0
+      } else if (newValue > this.$refs.container.scrollTopMax) {
+        newValue = this.$refs.container.scrollTopMax
+      }
+      this.scrollTop = newValue
+      this.$refs.container.scrollTop = newValue
+    },
+    updateScrollValues() {
+      this.$nextTick(() => {
+        this.scrollHeight = this.$el.scrollHeight
+        this.clientHeight = this.$el.clientHeight
+      })
+    },
+    handleScroll() {
+      this.scrollTop = this.$refs.container.scrollTop
+    },
     scrollToTop() {
       const el = this.$refs.container
       if (el) {
@@ -166,11 +206,13 @@ button[disabled] {
 .media-container {
   height: 100%;
   overflow: scroll;
-  scrollbar-color: auto black;
+  padding: 24px;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 
-  ::-webkit-scrollbar-track {
-    background-color: black;
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 }
 

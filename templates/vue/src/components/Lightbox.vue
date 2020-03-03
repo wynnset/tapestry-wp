@@ -92,15 +92,10 @@ export default {
         styles.position = "relative"
       }
 
-      if (this.node.mediaType === "accordion") {
-        return Object.assign(styles, { padding: "24px" })
-      }
-
       if (this.node.mediaType === "text" || this.node.mediaType === "wp-post") {
         return Object.assign(styles, {
           background: "#eee",
           color: "#333",
-          padding: "1em",
         })
       }
 
@@ -178,8 +173,9 @@ export default {
     close() {
       this.$router.push("/")
     },
-    handleLoad({ width, height }) {
-      if (width && height) {
+    handleLoad(opts) {
+      if (opts && opts.width && opts.height) {
+        const { width, height } = opts
         this.updateDimensions({ width, height })
       }
     },
@@ -211,7 +207,7 @@ body.tapestry-lightbox-open {
 <style lang="scss" scoped>
 .content-text {
   .media-wrapper {
-    overflow: scroll;
+    overflow-y: scroll;
   }
 }
 

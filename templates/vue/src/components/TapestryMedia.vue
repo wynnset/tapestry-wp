@@ -1,58 +1,53 @@
 <template>
-  <div
-    :class="[
-      'media-wrapper',
-      { 'media-wrapper-embed': node.mediaFormat === 'embed' },
-    ]"
-  >
-    <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
-    <video-media
-      v-if="node.mediaFormat === 'mp4'"
-      :autoplay="autoplay"
-      :node="node"
-      @load="handleLoad"
-      @complete="complete"
-      @timeupdate="updateProgress"
-      @close="$emit('close')"
-    />
-    <external-media
-      v-if="node.mediaType === 'url-embed'"
-      :node="node"
-      :dimensions="dimensions"
-      @mounted="handleLoad"
-      @complete="complete"
-    />
-    <h5p-media
-      v-if="node.mediaFormat === 'h5p'"
-      :autoplay="autoplay"
-      :node="node"
-      :width="dimensions.width"
-      :height="dimensions.height"
-      :settings="h5pSettings"
-      @load="handleLoad"
-      @update-settings="updateH5pSettings"
-      @timeupdate="updateProgress"
-      @complete="complete"
-      @close="$emit('close')"
-    />
-    <gravity-form
-      v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
-      :id="node.typeData.mediaURL"
-      @submit="handleFormSubmit"
-    ></gravity-form>
-    <wp-post-media
-      v-if="node.mediaType === 'wp-post'"
-      :node="node"
-      @complete="completeNode(nodeId)"
-    ></wp-post-media>
-    <quiz-media
-      v-if="node.mediaType === 'activity'"
-      :node="node"
-      @complete="completeNode(nodeId)"
-      @close="$emit('close')"
-    />
-    <completion-screen v-if="showCompletionScreen" />
-  </div>
+  <text-media v-if="node.mediaType === 'text'" :node="node" @complete="complete" />
+  <video-media
+    v-else-if="node.mediaFormat === 'mp4'"
+    :autoplay="autoplay"
+    :node="node"
+    @load="handleLoad"
+    @complete="complete"
+    @timeupdate="updateProgress"
+    @close="$emit('close')"
+  />
+  <external-media
+    v-else-if="node.mediaType === 'url-embed'"
+    :node="node"
+    :dimensions="dimensions"
+    @mounted="handleLoad"
+    @complete="complete"
+  />
+  <h5p-media
+    v-else-if="node.mediaFormat === 'h5p'"
+    :autoplay="autoplay"
+    :node="node"
+    :width="dimensions.width"
+    :height="dimensions.height"
+    :settings="h5pSettings"
+    @load="handleLoad"
+    @update-settings="updateH5pSettings"
+    @timeupdate="updateProgress"
+    @complete="complete"
+    @close="$emit('close')"
+  />
+  <gravity-form
+    v-else-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
+    :id="node.typeData.mediaURL"
+    @submit="handleFormSubmit"
+    @load="$emit('load')"
+  ></gravity-form>
+  <wp-post-media
+    v-else-if="node.mediaType === 'wp-post'"
+    :node="node"
+    @load="$emit('load')"
+    @complete="completeNode(nodeId)"
+  ></wp-post-media>
+  <quiz-media
+    v-else-if="node.mediaType === 'activity'"
+    :node="node"
+    @complete="completeNode(nodeId)"
+    @close="$emit('close')"
+  />
+  <completion-screen v-else-if="showCompletionScreen" />
 </template>
 
 <script>

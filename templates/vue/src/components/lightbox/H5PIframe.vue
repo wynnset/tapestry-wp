@@ -173,38 +173,6 @@ export default {
       })
     },
     handleLoad() {
-      this.$emit("is-loaded")
-
-      $("iframe").each(function() {
-        $(this)
-          .data("ratio", this.height / this.width)
-          // Remove the hardcoded width & height attributes
-          .removeAttr("width")
-          .removeAttr("height")
-      })
-      const setIframeDimensions = function() {
-        $("iframe").each(function() {
-          // Get the parent container's width
-          var width = $(this)
-            .parent()
-            .width()
-          var height = $(this)
-            .parent()
-            .height()
-          if (width * $(this).data("ratio") <= height) {
-            $(this)
-              .width(width)
-              .height(width * $(this).data("ratio"))
-          } else {
-            $(this)
-              .height(height)
-              .width(height / $(this).data("ratio"))
-          }
-        })
-      }
-      $(window).resize(setIframeDimensions)
-      setIframeDimensions()
-
       const h5pObj = this.$refs.h5p.contentWindow.H5P
       const loadedH5PId = h5pObj.instances[0].contentId
       // Check to see whether this is an H5P recorder
@@ -319,9 +287,14 @@ export default {
           }, 1000)
         }
       }
+      this.$emit("is-loaded")
     },
   },
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+#h5p {
+  height: 100%;
+}
+</style>

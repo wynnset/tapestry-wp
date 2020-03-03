@@ -55,6 +55,8 @@ export default {
     if (this.entry) {
       this.populateForm()
     }
+
+    this.$emit("load")
   },
   methods: {
     handleSubmit(event) {

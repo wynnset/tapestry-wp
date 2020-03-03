@@ -134,6 +134,7 @@ export default {
     handleLoad() {
       this.updateDimensions()
       this.seek()
+      this.$emit("load")
     },
     seek() {
       const video = this.$refs.video
@@ -187,6 +188,8 @@ export default {
   width: 100%;
   height: 100%;
   max-width: 100vw;
+  border-radius: 15px;
+  overflow: hidden;
 
   video {
     width: 100%;
