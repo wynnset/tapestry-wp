@@ -131,7 +131,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectParents"]),
+    ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
     },

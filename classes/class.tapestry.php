@@ -171,9 +171,7 @@ class Tapestry implements ITapestry
             $parent = $this->getNode($parentId)->get();
         }
 
-        if (!$this->validateNode($node, $parent)) {
-            throw new TapestryError("INVALID_NODE_TYPE");
-        }
+        $this->validateNode($node, $parent);
 
         $tapestryNode = new TapestryNode($this->postId);
         $tapestryNode->set($node);
@@ -250,11 +248,7 @@ class Tapestry implements ITapestry
         $parent = $this->getNode($link->source)->get();
         $child = $this->getNode($link->target)->get();
 
-        $isValid = $this->validateNode($child, $parent);
-
-        if (!$isValid) {
-            throw new TapestryError('INVALID_NODE_TYPE');
-        }
+        $this->validateNode($child, $parent);
 
         array_push($this->links, $link);
         $this->_saveToDatabase();
@@ -329,47 +323,106 @@ class Tapestry implements ITapestry
 
     public function validateNode($node, $parent = null)
     {
-        $tydeType = $node->tydeType;
+        $valid = function($node, $parent = null) {
 
-        if (!isset($tydeType) || !is_string($tydeType)) {
-            return true; // for backwards compatibility
-        }
+            $tydeType = $node->tydeType;
 
-        if (!isset($parent)) {
-            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
-        }
+            if (!isset($tydeType) || !is_string($tydeType)) {
+                return true; // for backwards compatibility
+            }
+    
+            if (!isset($parent)) {
+                return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
+            }
+    
+            $parentType = $parent->tydeType;
+            if (!isset($parentType) || $parentType == "") {
+                return true;
+            }
+    
+            if ($parentType == TydeTypes::MODULE) {
+                return $tydeType == TydeTypes::STAGE || $tydeType == TydeTypes::REGULAR;
+            } else if ($parentType == TydeTypes::STAGE) {
+                return $tydeType == TydeTypes::QUESTION_SET || $tydeType == TydeTypes::MODULE;
+            } else if ($parentType == TydeTypes::REGULAR) {
+                return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
+            } else {
+                // otherwise parent is a question set, so only valid if parent
+                // is an accordion
+                return $parent->mediaType == "accordion";
+            }
+        };
 
-        $parentType = $parent->tydeType;
-        if (!isset($parentType) || $parentType == "") {
-            return true;
-        }
-
-        if ($parentType == TydeTypes::MODULE) {
-            return $tydeType == TydeTypes::STAGE;
-        } else if ($parentType == TydeTypes::STAGE) {
-            return $tydeType == TydeTypes::QUESTION_SET;
-        } else if ($parentType == TydeTypes::REGULAR) {
-            return $tydeType == TydeTypes::MODULE || $tydeType == TydeTypes::REGULAR;
-        } else {
-            // otherwise parent is a question set, so only valid if parent
-            // is an accordion
-            return $parent->mediaType == "accordion";
+        if (!$valid($node, $parent)) {
+            throw new TapestryError('INVALID_NODE_TYPE');
         }
     }
 
     public function getNodeParent($nodeId)
     {
-        $parent = null;
+        if ($this->rootId == $nodeId) {
+            return null;
+        }
 
+        $node = new TapestryNode($this->postId, $nodeId);
+        $node = $node->get();
+
+        $neighbours = [];
         foreach($this->links as $link) {
             if ($link->target == $nodeId) {
-                $node = new TapestryNode($this->postId, $link->source);
-                $parent = $node->get();
+                $neighbour = new TapestryNode($this->postId, $link->source);
+                $neighbours[] = $neighbour->get();
+            }
+            elseif ($link->source == $nodeId) {
+                $neighbour = new TapestryNode($this->postId, $link->target);
+                $neighbours[] = $neighbour->get();
+            }
+        }
+
+        if (empty($neighbours)) {
+            return null;
+        }
+
+        $parentFound = null;
+        $accordionRowParent = null;
+        
+        foreach ($neighbours as $neighbour) {
+            switch ($node->tydeType) {  
+                case TydeTypes::MODULE:
+                    if ($neighbour->tydeType === TydeTypes::REGULAR || empty($neighbour->tydeType)) {
+                        $parentFound = $neighbour;
+                    }
+                    break;
+                case TydeTypes::STAGE:
+                    if ($neighbour->tydeType === TydeTypes::MODULE) {
+                        $parentFound = $neighbour;
+                    }
+                    break;
+                case TydeTypes::QUESTION_SET:
+                    if ($neighbour->tydeType === TydeTypes::STAGE) {
+                        $parentFound = $neighbour;
+                    }
+                    break;
+                default:
+                    if (!empty($neighbour->childOrdering) && in_array($nodeId, $neighbour->childOrdering)) {
+                        $parentFound = $neighbour;
+                    }
+                    break;
+            }
+            if (!empty($parentFound)) {
                 break;
             }
         }
 
-        return $parent;
+        if (!$parentFound) {
+            foreach ($neighbours as $neighbour) {
+                if (empty($neighbour->childOrdering)) {
+                    return $neighbour;
+                }
+            }
+        }
+
+        return $neighbours[0];
     }
 
     private function _loadFromDatabase()

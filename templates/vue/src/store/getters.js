@@ -1,7 +1,31 @@
-export function getParent(state) {
-  return id => {
-    const link = state.links.find(l => l.target == id || l.target.id == id)
-    return link ? link.source : null
+export function getParent(state, { getNode, getDirectParents, getDirectChildren}) {
+  return node => {
+    if (state.rootId === node.id) {
+      return null
+    }
+    const neighbourIds = getDirectParents(node.id).concat(getDirectChildren(node.id))
+    if (!neighbourIds) {
+      return null
+    }
+    const tydeTypes = {
+      REGULAR: "Regular",
+      MODULE: "Module",
+      STAGE: "Stage",
+      QUESTION_SET: "Question set",
+    }
+    const neighbours = neighbourIds.map( id => getNode(id) )
+    switch (node.tydeType) {
+      case tydeTypes.MODULE:
+        return neighbours.find( n => n.tydeType === tydeTypes.REGULAR || !n.tydeType ) || neighbours[0]
+      case tydeTypes.STAGE:
+        return neighbours.find( n => n.tydeType === tydeTypes.MODULE ) || neighbours[0]
+      case tydeTypes.QUESTION_SET:
+        return neighbours.find( n => n.tydeType === tydeTypes.STAGE ) || neighbours[0]
+      default:
+        return neighbours.find( n => n.tydeType === tydeTypes.STAGE )
+            || neighbours.find( n => n.mediaType === "accordion" && n.childOrdering && n.childOrdering.find( c => c.id === node.id) )
+            || neighbours.find( n => n.mediaType !== "accordion" ) || neighbours[0]
+    }
   }
 }
 

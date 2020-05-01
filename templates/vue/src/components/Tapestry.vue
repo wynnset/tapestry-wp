@@ -86,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedNode", "tapestry", "getNode", "getDirectParents"]),
+    ...mapGetters(["selectedNode", "tapestry", "getNode", "getParent"]),
     showRootNodeButton: function() {
       return (
         this.tapestryLoaded &&
@@ -127,7 +127,7 @@ export default {
   },
   watch: {
     selectedNode() {
-      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode)[0])
+      this.parentNode = this.getParent(this.selectedNode)
     },
   },
   async created() {
@@ -206,7 +206,7 @@ export default {
     },
     editNode() {
       this.modalType = "edit-node"
-      this.parentNode = this.getNode(this.getDirectParents(this.selectedNode.id)[0])
+      this.parentNode = this.getParent(this.selectedNode)
       this.populatedNode = this.selectedNode
       this.$bvModal.show("node-modal-container")
     },

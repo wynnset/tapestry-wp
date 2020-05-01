@@ -2073,11 +2073,32 @@ function tapestryTool(config){
      ****************************************************/
     
     function getParent(node) {
-        const links = tapestry.dataset.links;
-        const link = links.find(l => l.target == node.id || l.target.id == node.id);
-        return typeof link.source === "object" 
-            ? link.source 
-            : getNodeById(link.source);
+        if (tapestry.dataset.rootId === node.id) {
+            return null
+        }
+        const neighbourIds = getNeighbours(node.id)
+        if (!neighbourIds) {
+            return null
+        }
+        const tydeTypes = {
+            REGULAR: "Regular",
+            MODULE: "Module",
+            STAGE: "Stage",
+            QUESTION_SET: "Question set",
+        }
+        const neighbours = neighbourIds.map( id => getNodeById(id) )
+        switch (node.tydeType) {
+            case tydeTypes.MODULE:
+                return neighbours.find( n => n.tydeType === tydeTypes.REGULAR || !n.tydeType ) || neighbours[0]
+            case tydeTypes.STAGE:
+                return neighbours.find( n => n.tydeType === tydeTypes.MODULE ) || neighbours[0]
+            case tydeTypes.QUESTION_SET:
+                return neighbours.find( n => n.tydeType === tydeTypes.STAGE ) || neighbours[0]
+            default:
+                return neighbours.find( n => n.tydeType === tydeTypes.STAGE )
+                    || neighbours.find( n => n.mediaType === "accordion" && n.childOrdering && n.childOrdering.find( c => c.id === node.id) )
+                    || neighbours.find( n => n.mediaType !== "accordion" ) || neighbours[0]
+            }
     }
     
     // Set multiple attributes for an HTML element at once

@@ -22,6 +22,10 @@ class TapestryError extends Error
             'MESSAGE'   => 'PostID is invalid',
             'STATUS'    => ['status' => 404]
         ],
+        'INVALID_NODE_TYPE' => [
+            'MESSAGE'   => 'Node type is invalid',
+            'STATUS'    => ['status' => 406]
+        ],
         'INVALID_NODE_META_ID' => [
             'MESSAGE'   => 'NodeMetaId is invalid',
             'STATUS'    => ['status' => 404]

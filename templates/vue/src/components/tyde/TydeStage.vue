@@ -87,19 +87,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getNode", "getDirectChildren", "getDirectParents"]),
+    ...mapGetters(["getNode", "getDirectChildren"]),
     ...mapState(["selectedModuleId"]),
     done() {
       return this.topics.every(topic => topic.completed)
     },
     node() {
       return this.getNode(this.nodeId)
-    },
-    moduleId() {
-      const moduleIds = this.getDirectParents(this.nodeId).filter(
-        id => this.getNode(id).tydeType === tydeTypes.MODULE
-      )
-      return moduleIds[0]
     },
     nodeStyles() {
       return {

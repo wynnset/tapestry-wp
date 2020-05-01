@@ -564,11 +564,7 @@ function updateTapestryNode($request)
         }
 
         $tapestry = new Tapestry($postId);
-        $isValid = $tapestry->validateNode((object) $nodeData, $tapestry->getNodeParent($nodeMetaId));
-
-        if (!$isValid) {
-            throw new TapestryError('INVALID_NODE_TYPE');
-        }
+        $tapestry->validateNode((object) $nodeData, $tapestry->getNodeParent($nodeMetaId));
 
         $node = $tapestry->getNode($nodeMetaId);
         $node->set((object) $nodeData);

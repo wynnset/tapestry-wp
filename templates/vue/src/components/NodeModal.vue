@@ -604,7 +604,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getDirectChildren", "getDirectParents", "getNode"]),
+    ...mapGetters(["getDirectChildren", "getParent", "getNode"]),
     videoLabel() {
       const labels = {
         [tydeTypes.STAGE]: "Pre-Stage Video URL",
@@ -642,13 +642,9 @@ export default {
       return false
     },
     hasSubAccordion() {
-      const parents = this.getDirectParents(this.node.id)
-      if (parents && parents[0]) {
-        const parent = this.getNode(parents[0])
-        const children = this.getDirectChildren(this.node.id)
-        return parent.mediaType === "accordion" && children.length > 0
-      }
-      return false
+      const parent = this.getParent(this.node)
+      const children = this.getDirectChildren(this.node.id)
+      return parent && parent.mediaType === "accordion" && children.length
     },
     nodeType() {
       if (this.node.mediaFormat === "h5p") {

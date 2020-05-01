@@ -125,19 +125,34 @@ export function updateTydeProgress(state, { parentId, isParentModule }) {
       : childProgress.reduce(reducer, 0) / childNodes.length
   if (!isParentModule) {
     // If node is stage, parent module must be updated as well
-    getParentIds(state, parentId).map(id =>
+    getStageParent(state, parentId).map(id =>
       updateTydeProgress(state, { parentId: id, isParentModule: true })
     )
   }
 }
 
-function getParentIds(state, nodeId) {
+function getStageParent(state, nodeId) {
   const links = state.links
-  return links
+  let neighbourIds = links
+    .filter(link => link.source.id === nodeId || link.target.id === nodeId)
+    .map(link => link.source.id === nodeId ? link.target.id : link.source.id)
+  if (!neighbourIds) {
+    neighbourIds = links
+      .filter(link => link.source === nodeId || link.target === nodeId)
+      .map(link => link.source === nodeId ? link.target : link.source)
+  }
+  if (neighbourIds.length) {
+    const neighbours = neighbourIds.map( id => state.nodes.find(node => node.id === id) )
+    const parent = neighbours.find( n => n.tydeType === tydeTypes.MODULE ) || neighbours[0]
+    return [...parent.id]
+  }
+  else {
+    return links
     .filter(link =>
       link.target.id == undefined ? link.target == nodeId : link.target.id == nodeId
     )
     .map(link => (link.source.id == undefined ? link.source : link.source.id))
+  }
 }
 
 // favourites
