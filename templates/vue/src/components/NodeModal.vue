@@ -117,7 +117,7 @@
         Cancel
       </b-button>
       <b-button
-        v-if="rootId !== 0 && canMakeDraft"
+        v-if="canMakeDraft"
         id="draft-button"
         size="sm"
         variant="secondary"
@@ -125,7 +125,9 @@
         @click="handleDraftSubmit"
       >
         <b-spinner v-if="!canSubmit"></b-spinner>
-        <div :style="canSubmit ? '' : 'opacity: 50%;'">Save as Private Draft</div>
+        <div :style="canSubmit ? '' : 'opacity: 50%;'">
+          Save as Private Draft
+        </div>
       </b-button>
       <b-button
         v-if="canPublish"
@@ -266,6 +268,9 @@ export default {
           (!this.parent || this.parent.status !== "draft")
         )
       } else if (this.node.status === "draft" && this.type === "edit") {
+        if (this.node.id === this.rootId) {
+          return true
+        }
         return this.getNeighbours(this.nodeId).some(neighbourId => {
           let neighbour = this.getNode(neighbourId)
           return (
@@ -476,7 +481,6 @@ export default {
       if (!this.formErrors.length) {
         this.node.status = "publish"
         this.updateNodeCoordinates()
-        this.loading = true
 
         if (this.node.mediaType === "url-embed" && this.node.behaviour !== "embed") {
           await this.setLinkData()
@@ -522,9 +526,6 @@ export default {
             type: "",
           }
           await this.addLink(newLink)
-          if (this.node.status == "draft") {
-            this.updateSelectedNode(id)
-          }
         } else {
           this.updateRootNode(id)
         }
@@ -535,6 +536,12 @@ export default {
         })
       }
       await this.updateLockedStatus()
+      this.updateSelectedNode(this.node.id)
+      this.$router.push({
+          name: names.APP,
+          params: { nodeId: this.node.id },
+          query: this.$route.query,
+        })
       this.close()
       this.loading = false
     },
