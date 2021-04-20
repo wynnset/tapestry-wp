@@ -8,10 +8,13 @@
     <header>
       <h1
         v-if="showTitle"
-        :class="{
-          title: true,
-          'nested-media-title': isMultiContentContext,
-        }"
+        :class="[
+          'title',
+          {
+            'slideshow-title': node.presentationStyle === 'slideshow',
+            'nested-media-title': isMultiContentContext,
+          },
+        ]"
       >
         {{ node.title }}
       </h1>
@@ -40,6 +43,18 @@
       @changeRow="changeRow"
       @updateProgress="updateProgress"
     ></page-rows>
+    <slideshow
+      v-else-if="node.presentationStyle === 'slideshow'"
+      :dimensions="dimensions"
+      :node="node"
+      :rowId="rowId"
+      :subRowId="subRowId"
+      :context="context"
+      :level="level"
+      @load="handleLoad"
+      @changeRow="changeRow"
+      @updateProgress="updateProgress"
+    ></slideshow>
     <tapestry-modal
       v-if="showCompletion"
       :node-id="node.id"
@@ -68,6 +83,7 @@ import client from "@/services/TapestryAPI"
 import TapestryModal from "../../TapestryModal"
 import AccordionRows from "./AccordionRows"
 import PageRows from "./PageRows"
+import Slideshow from "./Slideshow"
 import { names } from "@/config/routes"
 
 export default {
@@ -76,6 +92,7 @@ export default {
     TapestryModal,
     AccordionRows,
     PageRows,
+    Slideshow,
   },
   props: {
     node: {
@@ -147,6 +164,10 @@ export default {
       return this.rows.findIndex(row => !row.node.completed)
     },
     showTitle() {
+      if (this.node.presentationStyle === "slideshow") {
+        return this.node.typeData.showSlideshowTitle
+      }
+
       return (
         this.level == 0 ||
         (this.context !== "accordion" && this.node.typeData.showTitle !== false)
@@ -310,6 +331,21 @@ button[disabled] {
 .title {
   color: #fff;
   margin-bottom: 1em;
+
+  &.nested-media-title {
+    text-align: left;
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 0.9em;
+
+    :before {
+      display: none;
+    }
+  }
+
+  &.slideshow-title {
+    margin-bottom: 0.3em;
+  }
 }
 
 .media-container {
@@ -321,17 +357,6 @@ button[disabled] {
 
   ::-webkit-scrollbar-track {
     background-color: black;
-  }
-}
-
-.nested-media-title {
-  text-align: left;
-  font-size: 1.75rem;
-  font-weight: 500;
-  margin-bottom: 0.9em;
-
-  :before {
-    display: none;
   }
 }
 

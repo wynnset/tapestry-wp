@@ -2,71 +2,53 @@
   <headless-multi-content
     :rows="rows.map(row => row.node.id)"
     :value="rowId"
+    presentationStyle="slideshow"
     @input="changeRow"
   >
-    <template v-slot="{ isVisible, hasNext, next }">
-      <div data-qa="page-rows">
-        <div
-          v-for="(row, index) in rows"
-          :id="`row-${row.node.id}`"
-          :key="row.node.id"
-          ref="rowRefs"
-          class="page-row"
-          :style="rowBackground"
-        >
+    <template>
+      <div>
+        <div class="slideshow-slide" data-qa="slideshow-slide">
           <div class="title-row">
-            <div v-if="disableRow(index, row.node)" class="title">
-              {{ row.node.title }}
-            </div>
-            <i
-              v-if="disableRow(index, row.node)"
-              class="fas fa-lock fa-sm title-row-icon"
-              style="color:white;"
-            ></i>
-            <a v-else class="title-row-icon">
+            <a class="title-row-icon">
               <i
-                v-if="isFavourite(row.node.id)"
+                v-if="isFavourite(slide.node.id)"
                 class="fas fa-heart fa-sm"
                 style="color:red; cursor:pointer;"
-                @click="toggleFavourite(row.node.id)"
+                @click="toggleFavourite(slide.node.id)"
               ></i>
               <i
                 v-else
                 class="fas fa-heart fa-sm"
                 style="color:white; cursor:pointer;"
-                @click="toggleFavourite(row.node.id)"
+                @click="toggleFavourite(slide.node.id)"
               ></i>
             </a>
           </div>
-          <div
-            v-if="!disableRow(index, row.node)"
-            :data-qa="`row-content-${row.node.id}`"
-          >
-            <div v-if="row.node.mediaType !== 'multi-content'">
+          <div :data-qa="`row-content-${slide.node.id}`">
+            <div v-if="slide.node.mediaType !== 'multi-content'">
               <tapestry-media
-                :node-id="row.node.id"
+                :node-id="slide.node.id"
                 :dimensions="dimensions"
-                context="page"
+                context="slideshow"
                 :autoplay="false"
                 style="color: white; margin-bottom: 24px;"
-                @complete="updateProgress(row.node.id)"
-                @load="handleLoad($refs.rowRefs[index])"
+                @complete="updateProgress(slide.node.id)"
               />
-              <p v-if="row.children.length > 0" style="color: white;">
-                {{ row.node.typeData.subAccordionText }}
+              <p v-if="slide.children.length > 0" style="color: white;">
+                {{ slide.node.typeData.subAccordionText }}
               </p>
               <sub-accordion
-                v-if="row.children.length > 0"
+                v-if="slide.children.length > 0"
                 :dimensions="dimensions"
-                :rows="row.children"
+                :rows="slide.children"
                 :row-id="subRowId"
                 @load="handleLoad"
                 @input="changeRow"
               />
             </div>
             <multi-content-media
-              v-else-if="row.children.length > 0"
-              :node="getNode(row.node.id)"
+              v-else-if="slide.children.length > 0"
+              :node="getNode(slide.node.id)"
               :row-id="subRowId"
               context="page"
               :level="level + 1"
@@ -74,15 +56,28 @@
               @complete="updateProgress"
             />
           </div>
-          <locked-content v-else :node="row.node"></locked-content>
-          <button
-            v-if="row.node.completed && isVisible(row)"
-            class="mt-2"
-            @click="hasNext ? next() : (showCompletion = true)"
-          >
-            {{ node.typeData.finishButtonText }}
-          </button>
         </div>
+        <footer class="slideshow-footer">
+          <p class="slideshow-step" data-qa="slideshow-step">
+            {{ currentSlideText }}
+          </p>
+          <button
+            class="button-nav"
+            data-qa="slideshow-prev-button"
+            :disabled="!hasPrev"
+            @click="prev"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button
+            class="button-nav"
+            data-qa="slideshow-next-button"
+            :disabled="!hasNext || disableNext"
+            @click="next"
+          >
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </footer>
       </div>
     </template>
   </headless-multi-content>
@@ -93,16 +88,14 @@ import { mapState, mapGetters, mapActions, mapMutations } from "vuex"
 import TapestryMedia from "../TapestryMedia"
 import HeadlessMultiContent from "./HeadlessMultiContent"
 import SubAccordion from "./SubAccordion"
-import LockedContent from "./common/LockedContent"
 
 export default {
-  name: "page-rows",
+  name: "slideshow",
   components: {
     TapestryMedia,
     HeadlessMultiContent,
     MultiContentMedia: () => import("../MultiContentMedia"),
     SubAccordion,
-    LockedContent,
   },
   props: {
     node: {
@@ -135,11 +128,9 @@ export default {
   },
   data() {
     return {
-      showCompletion: false,
+      index: 0,
+      disableNext: this.lockRows && !this.completed,
     }
-  },
-  mounted() {
-    this.$root.$emit("observe-rows", this.$refs.rowRefs)
   },
   computed: {
     ...mapGetters(["getDirectChildren", "getNode", "isFavourite", "isMultiContent"]),
@@ -156,27 +147,28 @@ export default {
     lockRows() {
       return this.node.typeData.lockRows
     },
-    disabledFrom() {
-      return this.rows.findIndex(row => !row.node.completed)
+    completed() {
+      return this.slide.node.completed
     },
-    isMultiContentContext() {
-      return (
-        this.context === "multi-content" ||
-        this.context === "page" ||
-        this.context === "accordion"
-      )
+    currentSlideText() {
+      return `${this.index + 1}/${this.rows.length}`
     },
-    rowBackground() {
-      if (this.isMultiContentContext) {
-        let rgb = 40
-        let colorOffset = this.level * 10
-        rgb = colorOffset > rgb ? 0 : rgb - colorOffset
-        return {
-          background: `rgb(${rgb}, ${rgb}, ${rgb})`,
-        }
-      } else {
-        return null
-      }
+    slide() {
+      return this.rows[this.index]
+    },
+    hasNext() {
+      return this.index < this.rows.length - 1
+    },
+    hasPrev() {
+      return this.index > 0
+    },
+  },
+  watch: {
+    completed: {
+      immediate: true,
+      handler(isCompleted) {
+        this.disableNext = this.lockRows && !isCompleted
+      },
     },
   },
   methods: {
@@ -185,17 +177,21 @@ export default {
     handleLoad(el) {
       this.$emit("load", el)
     },
-    disableRow(index, node) {
-      return (
-        (this.lockRows && this.disabledFrom >= 0 && index > this.disabledFrom) ||
-        !node.unlocked
-      )
-    },
     updateProgress(rowId) {
       this.$emit("updateProgress", rowId)
     },
     changeRow(rowId) {
       this.$emit("changeRow", rowId)
+    },
+    next() {
+      if (this.hasNext && !this.disableNext) {
+        this.changeRow(this.rows[++this.index].node.id)
+      }
+    },
+    prev() {
+      if (this.hasPrev) {
+        this.changeRow(this.rows[--this.index].node.id)
+      }
     },
     handleAutoClose() {
       this.$emit("close")
@@ -223,16 +219,7 @@ button[disabled] {
   text-align: right;
 }
 
-.title {
-  background: none;
-  width: 100%;
-  text-align: left;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.page-row {
+.slide-row {
   background: #262626;
   border-radius: 4px;
   padding: 8px 16px;
@@ -240,6 +227,63 @@ button[disabled] {
 
   &:last-child {
     margin-bottom: 0;
+  }
+}
+
+.slideshow-footer {
+  margin-top: 1em;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.button-nav {
+  border-radius: 50%;
+  height: 56px;
+  width: 56px;
+  background: #262626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  margin: 0;
+  margin-right: 12px;
+  opacity: 1;
+  transition: all 0.1s ease-out;
+
+  &:hover {
+    background: #11a6d8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.slideshow-step {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  font-size: 40px;
+  color: white;
+  margin-right: 32px;
+}
+
+.sub-multicontent-title {
+  text-align: left;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: white;
+
+  :before {
+    display: none;
   }
 }
 </style>

@@ -38,6 +38,11 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -45,11 +50,6 @@ export default {
       html: "",
       loading: true,
     }
-  },
-  computed: {
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
-    },
   },
   watch: {
     id(newId) {

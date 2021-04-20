@@ -1,0 +1,358 @@
+{
+    "nodes": [
+      {
+        "id": 15082,
+        "author": {
+          "id": "1",
+          "name": "admin"
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Slideshow",
+        "status": "publish",
+        "thumbnailFileId": "",
+        "lockedThumbnailFileId": "",
+        "reviewStatus": "",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "multi-content",
+        "presentationStyle": "slideshow",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "new-window",
+        "typeData": {
+          "lockRows": true,
+          "finishButtonText": "Finish",
+          "confirmationTitleText": "Section Complete!",
+          "confirmationBodyText": "Would you like to continue?",
+          "continueButtonText": "Continue",
+          "cancelLinkText": "Cancel",
+          "showNavBar": true,
+          "linkMetadata": null,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": ""
+        },
+        "coordinates": {
+          "x": 3000,
+          "y": 3000,
+          "fx": 3000,
+          "fy": 3000
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ],
+          "copilot": [
+            "read"
+          ],
+          "user-1": [
+            "read",
+            "add",
+            "edit"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [
+          15085,
+          15087,
+          15089
+        ],
+        "fitWindow": true,
+        "reviewComments": [],
+        "license": {
+          "name": "CC-BY-SA",
+          "icons": [
+            "fab fa-creative-commons",
+            "fab fa-creative-commons-by",
+            "fab fa-creative-commons-sa"
+          ],
+          "type": "cc",
+          "link": "",
+          "description": ""
+        },
+        "references": "",
+        "mapCoordinates": {
+          "lat": "",
+          "lng": ""
+        }
+      },
+      {
+        "id": 15085,
+        "postId": 8170,
+        "author": {
+          "id": "1",
+          "name": "admin",
+          "email": "foo@bar.com",
+          "original_author_name": "",
+          "original_author_email": ""
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Slide1",
+        "status": "publish",
+        "thumbnailFileId": "",
+        "lockedThumbnailFileId": "",
+        "reviewStatus": "",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "text",
+        "presentationStyle": "",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "new-window",
+        "typeData": {
+          "linkMetadata": null,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": "These are some details."
+        },
+        "coordinates": {
+          "x": 2616.078630055592,
+          "y": 2841.561016041772
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ],
+          "copilot": [
+            "read"
+          ],
+          "user-1": [
+            "read",
+            "add",
+            "edit"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "reviewComments": [],
+        "license": "",
+        "references": "",
+        "mapCoordinates": {
+          "lat": "",
+          "lng": ""
+        }
+      },
+      {
+        "id": 15087,
+        "postId": 8171,
+        "author": {
+          "id": "1",
+          "name": "admin",
+          "email": "foo@bar.com",
+          "original_author_name": "",
+          "original_author_email": ""
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Slide2",
+        "status": "publish",
+        "thumbnailFileId": "",
+        "lockedThumbnailFileId": "",
+        "reviewStatus": "",
+        "imageURL": "https://i.ytimg.com/vi/d63DL-Erz50/maxresdefault.jpg",
+        "lockedImageURL": "https://i.ytimg.com/vi/d63DL-Erz50/maxresdefault.jpg",
+        "mediaType": "video",
+        "presentationStyle": "",
+        "mediaFormat": "youtube",
+        "mediaDuration": 89,
+        "description": "",
+        "behaviour": "new-window",
+        "typeData": {
+          "linkMetadata": {
+            "title": "UBC Astronomy student's star-gazing passion overflows into club involvement",
+            "description": "See the full profile of UBC Astronomy student Robin Newhouse at https://bit.ly/38T4Rw7.",
+            "image": "https://i.ytimg.com/vi/d63DL-Erz50/maxresdefault.jpg",
+            "url": "https://youtu.be/d63DL-Erz50"
+          },
+          "mediaURL": "https://youtu.be/d63DL-Erz50",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": "",
+          "youtubeID": "d63DL-Erz50"
+        },
+        "coordinates": {
+          "x": 3453.872488926798,
+          "y": 2804.1057244881204
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ],
+          "copilot": [
+            "read"
+          ],
+          "user-1": [
+            "read",
+            "add",
+            "edit"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "reviewComments": [],
+        "license": "",
+        "references": "",
+        "mapCoordinates": {
+          "lat": "",
+          "lng": ""
+        }
+      },
+      {
+        "id": 15089,
+        "postId": 8172,
+        "author": {
+          "id": "1",
+          "name": "admin",
+          "email": "foo@bar.com",
+          "original_author_name": "",
+          "original_author_email": ""
+        },
+        "type": "tapestry_node",
+        "size": "",
+        "title": "Slide3",
+        "status": "publish",
+        "thumbnailFileId": "",
+        "lockedThumbnailFileId": "",
+        "reviewStatus": "",
+        "imageURL": "",
+        "lockedImageURL": "",
+        "mediaType": "text",
+        "presentationStyle": "",
+        "mediaFormat": "",
+        "mediaDuration": 0,
+        "description": "",
+        "behaviour": "new-window",
+        "typeData": {
+          "linkMetadata": null,
+          "mediaURL": "",
+          "mediaWidth": 960,
+          "mediaHeight": 600,
+          "subAccordionText": "More content:",
+          "textContent": "Another test node"
+        },
+        "coordinates": {
+          "x": 2985.2439321530214,
+          "y": 2587.913926936561
+        },
+        "permissions": {
+          "public": [
+            "read"
+          ],
+          "authenticated": [
+            "read"
+          ],
+          "contributor": [
+            "read"
+          ],
+          "subscriber": [
+            "read"
+          ],
+          "copilot": [
+            "read"
+          ],
+          "user-1": [
+            "read",
+            "add",
+            "edit"
+          ]
+        },
+        "hideTitle": false,
+        "hideProgress": false,
+        "hideMedia": false,
+        "skippable": true,
+        "quiz": [],
+        "fullscreen": false,
+        "conditions": [],
+        "childOrdering": [],
+        "fitWindow": true,
+        "reviewComments": [],
+        "license": "",
+        "references": "",
+        "mapCoordinates": {
+          "lat": "",
+          "lng": ""
+        }
+      }
+    ],
+    "groups": [],
+    "links": [
+      {
+        "source": 15082,
+        "target": 15085,
+        "value": 1,
+        "type": "",
+        "addedOnNodeCreation": true
+      },
+      {
+        "source": 15082,
+        "target": 15087,
+        "value": 1,
+        "type": "",
+        "addedOnNodeCreation": true
+      },
+      {
+        "source": 15082,
+        "target": 15089,
+        "value": 1,
+        "type": "",
+        "addedOnNodeCreation": true
+      }
+    ],
+    "site-url": "http://localhost"
+  }

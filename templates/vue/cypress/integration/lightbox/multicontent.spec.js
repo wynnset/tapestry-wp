@@ -4,6 +4,7 @@ describe("Multi-content", () => {
     cy.fixture("accordion.json").as("accordion")
     cy.fixture("deep-accordion.json").as("deep-accordion")
     cy.fixture("page.json").as("page")
+    cy.fixture("slideshow.json").as("slideshow")
   })
 
   describe("In-place", () => {
@@ -339,6 +340,61 @@ describe("Multi-content", () => {
             cy.contains(textNode.typeData.textContent).should("not.exist")
             cy.contains(moreNode.title).should("not.exist")
             cy.contains(moreNode.typeData.textContent).should("not.exist")
+          })
+        })
+    })
+  })
+
+  describe("Slideshow", () => {
+    it("should render, navigate unlocked slides, and disable nagivating to locked slides", () => {
+      cy.setup("@slideshow")
+
+      cy.store()
+        .its("state.nodes")
+        .then(nodes => {
+          const [slideshowNode, textNode, videoNode, nextNode] = Object.values(nodes)
+          const totalSlides = 3
+
+          // Locked
+          cy.openLightbox(slideshowNode.id).within(() => {
+            cy.contains(textNode.title).should("exist")
+            cy.contains(textNode.typeData.textContent).should("exist")
+            cy.getByTestId("slideshow-prev-button").should("be.disabled")
+            cy.getByTestId("slideshow-step").contains(`1/${totalSlides}`)
+
+            cy.getByTestId("slideshow-next-button").click()
+            cy.getByTestId("slideshow-step").contains(`2/${totalSlides}`)
+            cy.get("iframe[id^=youtube]").should("exist")
+            cy.contains(videoNode.title).should("exist")
+            cy.getByTestId("slideshow-next-button").should("be.disabled")
+
+            cy.getByTestId("slideshow-prev-button").click()
+            cy.getByTestId("slideshow-step").contains(`1/${totalSlides}`)
+            cy.contains(textNode.title).should("exist")
+            cy.contains(textNode.typeData.textContent).should("exist")
+          })
+          cy.closeLightbox()
+
+          cy.openModal("edit", slideshowNode.id)
+          cy.getByTestId("lock-checkbox").click({ force: true })
+          cy.submitModal()
+
+          // Unlocked
+          cy.openLightbox(slideshowNode.id).within(() => {
+            cy.contains(textNode.title).should("exist")
+            cy.contains(textNode.typeData.textContent).should("exist")
+            cy.getByTestId("slideshow-prev-button").should("be.disabled")
+            cy.getByTestId("slideshow-step").contains(`1/${totalSlides}`)
+
+            cy.getByTestId("slideshow-next-button").click()
+            cy.getByTestId("slideshow-step").contains(`2/${totalSlides}`)
+            cy.get("iframe[id^=youtube]").should("exist")
+            cy.contains(videoNode.title).should("exist")
+
+            cy.getByTestId("slideshow-next-button").click()
+            cy.getByTestId("slideshow-step").contains(`3/${totalSlides}`)
+            cy.contains(nextNode.title).should("exist")
+            cy.contains(nextNode.typeData.textContent).should("exist")
           })
         })
     })

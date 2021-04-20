@@ -56,6 +56,11 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     normalizedUrl() {
@@ -69,9 +74,6 @@ export default {
         }
       }
       return {}
-    },
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   mounted() {

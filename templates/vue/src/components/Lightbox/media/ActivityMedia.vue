@@ -30,10 +30,10 @@ export default {
       required: false,
       default: "",
     },
-  },
-  computed: {
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   mounted() {
@@ -60,7 +60,7 @@ export default {
   text-align: left;
   font-size: 1.75rem;
   font-weight: 500;
-  margin-bottom: 0.9em;
+  margin-bottom: 0.5em;
 
   :before {
     display: none;

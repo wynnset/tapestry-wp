@@ -247,6 +247,10 @@ export default {
   beforeDestroy() {
     document.querySelector("body").classList.remove("tapestry-lightbox-open")
     DragSelectModular.addDragSelectListener()
+    this.$router.push({
+      ...this.$route,
+      query: { ...this.$route.query, row: undefined },
+    })
   },
   methods: {
     ...mapActions(["completeNode"]),

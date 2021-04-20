@@ -18,16 +18,15 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     content() {
       return this.node.typeData.textContent
-    },
-    showTitle() {
-      return (
-        this.context !== "page" ||
-        (this.context === "page" && this.node.typeData.showTitle !== false)
-      )
     },
   },
   mounted() {

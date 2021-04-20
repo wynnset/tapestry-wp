@@ -87,11 +87,15 @@ export default {
       const { nodeId, rowId } = this.$route.params
       if (subRowId) {
         if (rowId !== undefined) {
-          this.$router.push({
-            name: names.SUBMULTICONTENT,
-            params: { nodeId, rowId, subRowId },
-            query: this.$route.query,
-          })
+          if (this.$route.params.subRowId) {
+            this.$emit("input", subRowId)
+          } else {
+            this.$router.push({
+              name: names.SUBMULTICONTENT,
+              params: { nodeId, rowId, subRowId },
+              query: this.$route.query,
+            })
+          }
         } else {
           this.$router.push({
             name: names.SUBMULTICONTENT,

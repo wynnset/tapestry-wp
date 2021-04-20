@@ -67,6 +67,7 @@
                 :rows="row.children"
                 :row-id="subRowId"
                 @load="handleLoad"
+                @input="changeRow"
               />
             </div>
             <multi-content-media

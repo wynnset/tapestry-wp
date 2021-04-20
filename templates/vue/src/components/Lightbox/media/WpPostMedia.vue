@@ -28,6 +28,11 @@ export default {
       required: false,
       default: "",
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -39,9 +44,6 @@ export default {
   computed: {
     id() {
       return this.node.typeData.mediaURL
-    },
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
     },
   },
   async mounted() {
@@ -79,9 +81,9 @@ export default {
 
 .wp-media-title {
   text-align: left;
-  margin-bottom: 0.9em;
   font-weight: 500;
   font-size: 1.75rem;
+  margin-bottom: 0.5em;
 
   :before {
     display: none;

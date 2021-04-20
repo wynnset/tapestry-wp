@@ -25,33 +25,40 @@ export function getParent(state) {
 }
 
 export function isMultiContent(_, { getNode, isSubMultiContent }) {
-  return id => {
+  return (id, hasAttributeFunc = () => true) => {
     const node = getNode(id)
-    return node.mediaType === "multi-content" || isSubMultiContent(id)
+    return (
+      hasAttributeFunc(node) &&
+      (node.mediaType === "multi-content" || isSubMultiContent(id, hasAttributeFunc))
+    )
   }
 }
 
 export function isSubMultiContent(_, { getNode, getParent }) {
-  return id => {
+  return (id, hasParentAttributeFunc = () => true) => {
     const parent = getParent(id)
     if (parent) {
       const parentNode = getNode(parent)
-      return parentNode.mediaType === "multi-content"
+      return (
+        parentNode.mediaType === "multi-content" &&
+        hasParentAttributeFunc(parentNode)
+      )
     }
     return false
   }
 }
 
 export function isMultiContentRow(_, { getParent, isMultiContent }) {
-  return (id, multiContent) => {
+  return (id, multiContent, hasParentAttributeFunc = () => true) => {
     const parent = getParent(id)
     if (!parent) {
       return false
     }
     if (multiContent !== undefined) {
-      return parent === multiContent
+      const parentNode = getNode(parent)
+      return parent === multiContent && hasParentAttributeFunc(parentNode)
     }
-    return isMultiContent(parent)
+    return isMultiContent(parent, hasParentAttributeFunc)
   }
 }
 

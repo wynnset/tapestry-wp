@@ -15,6 +15,7 @@
       v-if="node.mediaType === 'text'"
       :node="node"
       :context="context"
+      :showTitle="showTitle()"
       @complete="complete"
       @load="handleLoad"
     />
@@ -22,6 +23,7 @@
       v-if="node.mediaFormat === 'mp4'"
       :autoplay="autoplay"
       :node="node"
+      :showTitle="showTitle()"
       :dimensions="dimensions"
       :context="context"
       @load="handleLoad"
@@ -33,6 +35,7 @@
       v-if="node.mediaFormat === 'youtube'"
       :autoplay="autoplay"
       :node="node"
+      :showTitle="showTitle()"
       :dimensions="dimensions"
       :context="context"
       @load="handleLoad"
@@ -44,6 +47,7 @@
       v-if="node.mediaType === 'url-embed'"
       :dimensions="dimensions"
       :node="node"
+      :showTitle="showTitle()"
       :context="context"
       @load="handleLoad"
       @complete="complete"
@@ -54,6 +58,7 @@
       :dimensions="dimensions"
       :context="context"
       :node="node"
+      :showTitle="showTitle()"
       @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @timeupdate="updateProgress"
@@ -64,6 +69,7 @@
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
       :id="node.typeData.mediaURL"
       :node="node"
+      :showTitle="showTitle()"
       :context="context"
       @submit="handleFormSubmit"
       @load="handleLoad"
@@ -71,6 +77,7 @@
     <wp-post-media
       v-if="node.mediaType === 'wp-post'"
       :node="node"
+      :showTitle="showTitle()"
       :context="context"
       @complete="complete"
       @load="handleLoad"
@@ -78,6 +85,7 @@
     <activity-media
       v-if="node.mediaType === 'activity'"
       :node="node"
+      :showTitle="showTitle()"
       :context="context"
       @complete="complete"
       @close="$emit('close')"
@@ -164,6 +172,21 @@ export default {
     },
     complete() {
       this.$emit("complete")
+    },
+    showTitle() {
+      if (this.node.mediaType === "text") {
+        return (
+          this.context !== "page" ||
+          (this.context === "page" && this.node.typeData.showTitle !== false)
+        )
+      } else if (this.node.mediaType === "wp-post") {
+        return this.context === "page" && this.node.typeData.showTitle !== false
+      } else {
+        return (
+          this.context === "slideshow" ||
+          (this.context === "page" && this.node.typeData.showTitle !== false)
+        )
+      }
     },
   },
 }

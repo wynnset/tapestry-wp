@@ -10,6 +10,11 @@ export default {
       type: null,
       required: true,
     },
+    presentationStyle: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   computed: {
     hasNext() {
@@ -18,7 +23,7 @@ export default {
   },
   methods: {
     isVisible(row) {
-      if (this.value === row) {
+      if (this.value === row || this.presentationStyle === "slideshow") {
         return true
       } else if (this.$route.params.subRowId) {
         // To handle multiple rows

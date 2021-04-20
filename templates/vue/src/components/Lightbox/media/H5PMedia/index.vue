@@ -67,6 +67,11 @@ export default {
       required: false,
       default: true,
     },
+    showTitle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -78,9 +83,6 @@ export default {
   },
   computed: {
     ...mapState(["h5pSettings"]),
-    showTitle() {
-      return this.context === "page" && this.node.typeData.showTitle !== false
-    },
   },
   methods: {
     ...mapActions(["updateH5pSettings"]),
@@ -130,7 +132,6 @@ export default {
 
 .video-title {
   text-align: left;
-  margin-bottom: 0.9em;
   font-weight: 500;
   font-size: 1.75rem;
 

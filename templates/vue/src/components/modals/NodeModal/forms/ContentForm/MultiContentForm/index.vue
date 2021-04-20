@@ -54,6 +54,7 @@ export default {
       presentationStyles: [
         { value: "accordion", text: "Accordion" },
         { value: "page", text: "Page" },
+        { value: "slideshow", text: "Slideshow" },
       ],
     }
   },
