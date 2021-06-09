@@ -156,6 +156,17 @@ export async function completeNode(context, nodeId) {
       newNode: { completed: true },
     })
 
+    const userProgress = await client.getUserProgress()
+    for (const [nodeId] of Object.entries(userProgress)) {
+      if (getters.getTydeProgress(nodeId) >= 1) {
+        await client.completeNode(nodeId)
+        commit("updateNode", {
+          id: nodeId,
+          newNode: { completed: true },
+        })
+      }
+    }
+
     const node = getters.getNode(nodeId)
     if (node.mediaType !== "video") {
       await dispatch("updateNodeProgress", {
@@ -163,6 +174,7 @@ export async function completeNode(context, nodeId) {
         progress: 1,
       })
     }
+
     return unlockNodes(context)
   } catch (error) {
     dispatch("addApiError", error)
@@ -177,10 +189,7 @@ async function unlockNodes({ commit, getters, dispatch }) {
       if (
         currentNode &&
         Helpers.isDifferent(
-          {
-            accessible: nodeProgress.accessible,
-            unlocked: nodeProgress.unlocked,
-          },
+          { accessible: nodeProgress.accessible, unlocked: nodeProgress.unlocked },
           { accessible: currentNode.accessible, unlocked: currentNode.unlocked }
         )
       ) {
