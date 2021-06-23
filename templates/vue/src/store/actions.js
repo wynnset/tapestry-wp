@@ -27,12 +27,14 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
 export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {
     const response = await client.addNode(JSON.stringify(newNode))
-
     const nodeToAdd = { ...newNode }
     const id = response.data.id
     nodeToAdd.id = id
     nodeToAdd.author = response.data.author
     nodeToAdd.permissions = response.data.permissions
+    if (response.data.typeData.h5pMeta) {
+      nodeToAdd.typeData.h5pMeta = response.data.typeData.h5pMeta
+    }
 
     commit("addNode", nodeToAdd)
     commit("updateVisibleNodes", [...state.visibleNodes, id])

@@ -20,25 +20,25 @@
       @load="handleLoad"
     />
     <video-media
-      v-if="node.mediaFormat === 'mp4'"
+      v-if="isVideoNode"
       :autoplay="autoplay"
-      :node="node"
       :dimensions="dimensions"
       :context="context"
+      :node-id="nodeId"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
-      @complete="complete"
       @timeupdate="updateProgress"
+      @complete="complete"
       @close="$emit('close')"
     />
-    <youtube-media
-      v-if="node.mediaFormat === 'youtube'"
-      :autoplay="autoplay"
-      :node="node"
+    <h5p-media
+      v-if="node.mediaType === 'h5p' && !isVideoNode"
       :dimensions="dimensions"
       :context="context"
+      :node="node"
+      @change:dimensions="$emit('change:dimensions', $event)"
       @load="handleLoad"
       @complete="complete"
-      @timeupdate="updateProgress"
       @close="$emit('close')"
     />
     <external-media
@@ -48,18 +48,6 @@
       :context="context"
       @load="handleLoad"
       @complete="complete"
-    />
-    <h5p-media
-      v-if="node.mediaFormat === 'h5p'"
-      :autoplay="autoplay"
-      :dimensions="dimensions"
-      :context="context"
-      :node="node"
-      @change:dimensions="$emit('change:dimensions', $event)"
-      @load="handleLoad"
-      @timeupdate="updateProgress"
-      @complete="complete"
-      @close="$emit('close')"
     />
     <gravity-form
       v-if="node.mediaType === 'gravity-form' && !showCompletionScreen"
@@ -92,10 +80,9 @@
 import { mapActions, mapGetters } from "vuex"
 import TextMedia from "./TextMedia"
 import VideoMedia from "./VideoMedia"
-import ExternalMedia from "./ExternalMedia"
 import H5PMedia from "./H5PMedia"
+import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
-import YouTubeMedia from "./YouTubeMedia"
 import WpPostMedia from "./WpPostMedia"
 import GravityForm from "./common/GravityForm"
 import CompletionScreen from "./common/ActivityScreen/CompletionScreen"
@@ -105,13 +92,12 @@ export default {
   components: {
     TextMedia,
     VideoMedia,
-    ExternalMedia,
     "h5p-media": H5PMedia,
+    ExternalMedia,
     GravityForm,
     WpPostMedia,
     CompletionScreen,
     ActivityMedia,
-    "youtube-media": YouTubeMedia,
   },
   props: {
     nodeId: {
@@ -120,7 +106,8 @@ export default {
     },
     dimensions: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     context: {
       type: String,
@@ -143,6 +130,14 @@ export default {
     ...mapGetters(["getNode"]),
     node() {
       return this.getNode(this.nodeId)
+    },
+    isVideoNode() {
+      if (this.node.mediaType === "h5p" || this.node.mediaFormat === "h5p") {
+        if (this.node.typeData.h5pMeta.library === "H5P.InteractiveVideo") {
+          return true
+        }
+      }
+      return ["mp4", "youtube"].includes(this.node.mediaFormat)
     },
   },
   beforeDestroy() {
@@ -169,11 +164,11 @@ export default {
     handleLoad(args) {
       this.$emit("load", args)
     },
-    updateProgress(amountViewed) {
+    updateProgress({ amountViewed }) {
       this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
     },
-    complete() {
-      this.$emit("complete")
+    complete(nodeId) {
+      this.$emit("complete", nodeId)
     },
   },
 }

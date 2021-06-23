@@ -39,13 +39,15 @@ export default {
 
 <style lang="scss" scoped>
 .article {
-  padding: 0 1em 1em;
+  padding: 1em;
+  background: rgb(238, 238, 238);
   text-align: left;
+  min-height: 100%;
 
   h1 {
     font-size: 1.75rem;
     font-weight: 500;
-    margin: 1em auto;
+    margin-bottom: 1em;
 
     :before {
       display: none;

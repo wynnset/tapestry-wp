@@ -4,6 +4,7 @@ require_once dirname(__FILE__).'/../utilities/class.tapestry-errors.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-helpers.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 require_once dirname(__FILE__).'/../utilities/class.tapestry-node-permissions.php';
+require_once dirname(__FILE__).'/../classes/class.tapestry-h5p.php';
 require_once dirname(__FILE__).'/../classes/class.constants.php';
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry.php';
 require_once dirname(__FILE__).'/class.constants.php';
@@ -172,6 +173,11 @@ class Tapestry implements ITapestry
         if (empty($this->rootId)) {
             $this->rootId = $node->id;
         }
+
+        $nodeArray = [$node];
+        $nodeArray = $this->_addH5PMeta($nodeArray);
+        $node = array_values($nodeArray)[0];
+        $node = $tapestryNode->save($node);
 
         $this->_saveToDatabase();
 
@@ -559,6 +565,8 @@ class Tapestry implements ITapestry
             $tapestry->groups
         );
 
+        $tapestry->nodes = $this->_addH5PMeta($tapestry->nodes);
+
         return $tapestry;
     }
 
@@ -616,6 +624,26 @@ class Tapestry implements ITapestry
         $this->_traverseNodes($rootId, $checked, $nodesPermitted, $superuser_override, $currentUserId, $secondaryUserId);
 
         return $nodesPermitted;
+    }
+
+    private function _addH5PMeta($nodes)
+    {
+        $controller = new TapestryH5P();
+        $allH5Ps = $controller->get();
+        foreach ($nodes as $i => $node) {
+            if ('h5p' == $node->mediaType && $node->typeData->mediaURL) {
+                $H5PURLParts = explode('&id=', $node->typeData->mediaURL);
+                if (count($H5PURLParts) >= 2) {
+                    $H5PId = $H5PURLParts[1];
+                    $H5PIndex = array_search($H5PId, array_column($allH5Ps, 'id'));
+                    if ($H5PIndex || 0 == $H5PIndex) {
+                        $nodes[$i]->typeData->h5pMeta = $allH5Ps[$H5PIndex];
+                    }
+                }
+            }
+        }
+
+        return $nodes;
     }
 
     private function _filterNodesMetaIdsByStatus($nodeMetaIds)

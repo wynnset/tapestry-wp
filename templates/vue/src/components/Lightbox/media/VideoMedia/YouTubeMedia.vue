@@ -1,68 +1,42 @@
 <template>
-  <div>
-    <h1 v-if="showTitle" class="video-title">{{ node.title }}</h1>
-    <div
-      class="embed-responsive embed-responsive-16by9"
-      :style="isMultiContentContext ? '' : 'top: 1.75em'"
-    >
-      <end-screen
-        v-if="showEndScreen"
-        :node="node"
-        @rewatch="rewatch"
-        @close="close"
-        @show-quiz="openQuiz"
-      />
-      <activity-screen
-        v-else-if="showActivityScreen"
-        :id="node.id"
-        @back="back"
-        @close="close"
-      />
-      <youtube
-        class="embed-responsive-item"
-        :video-id="node.typeData.youtubeID"
-        :player-width="dimensions.width - 15"
-        :player-height="dimensions.height - 40"
-        :player-vars="{
-          autoplay: autoplay,
-          modestbranding: 1,
-          rel: 0,
-          iv_load_policy: 3,
-          enablejsapi: 1,
-        }"
-        @ready="ready"
-        @paused="handlePause"
-        @playing="handlePlay"
-        @ended="handleEnd"
-      />
-    </div>
+  <div class="embed-responsive embed-responsive-16by9">
+    <youtube
+      class="embed-responsive-item"
+      :video-id="node.typeData.youtubeID"
+      :player-width="dimensions.width - 15"
+      :player-height="dimensions.height - 40"
+      :player-vars="{
+        autoplay: 0,
+        modestbranding: 1,
+        rel: 0,
+        iv_load_policy: 3,
+        enablejsapi: 1,
+      }"
+      @ready="ready"
+      @paused="handlePause"
+      @playing="handlePlay"
+      @ended="handleEnd"
+    />
   </div>
 </template>
 
 <script>
-import EndScreen from "./common/EndScreen"
-import ActivityScreen from "./common/ActivityScreen"
 import { mapState, mapActions } from "vuex"
 import Helpers from "@/utils/Helpers"
 import client from "@/services/TapestryAPI"
 
-const ALLOW_SKIP_THRESHOLD = 0.95
+import { SEEK_THRESHOLD } from "./video.config"
 
 export default {
   name: "video-media",
-  components: {
-    EndScreen,
-    ActivityScreen,
-  },
   props: {
     node: {
       type: Object,
       required: true,
     },
-    autoplay: {
+    playing: {
       type: Boolean,
-      required: false,
-      default: true,
+      required: true,
     },
     dimensions: {
       type: Object,
@@ -79,11 +53,8 @@ export default {
   },
   data() {
     return {
-      showEndScreen: this.getInitialEndScreenState(),
-      showActivityScreen: false,
       videoDimensions: null,
       player: null,
-      playedOnce: false,
     }
   },
   computed: {
@@ -103,6 +74,17 @@ export default {
       return this.context === "page" || this.context === "multi-content"
     },
   },
+  watch: {
+    playing(playing) {
+      if (playing) {
+        this.player.playVideo()
+        this.startInterval()
+      } else {
+        this.stopInterval()
+        this.player.pauseVideo()
+      }
+    },
+  },
   beforeDestroy() {
     if (this.player) {
       this.player.stopVideo()
@@ -114,64 +96,38 @@ export default {
     ...mapActions(["updateH5pSettings"]),
     ready(event) {
       this.player = event.target
-      this.player.seekTo(this.progress * this.player.getDuration(), true)
+
+      const currentTime = this.progress * this.player.getDuration()
+      this.lastTime = currentTime
+      this.player.seekTo(currentTime, true)
       this.applySettings()
-      if (this.autoplay) {
-        client.recordAnalyticsEvent("app", "auto-play", "yt-video", this.node.id)
-      } else {
-        // To prevent autoplay on video states other than "not started"
-        this.player.stopVideo()
-      }
+
+      this.$emit("load", { currentTime })
     },
-    openQuiz() {
-      this.showEndScreen = false
-      this.showActivityScreen = true
-    },
-    back() {
-      this.showEndScreen = true
-      this.showActivityScreen = false
-    },
-    rewatch() {
-      this.showEndScreen = false
-      if (this.player) {
-        this.player.seekTo(0, true)
-        this.player.playVideo()
-      }
+    reset() {
+      this.player.seekTo(0, true)
+      setTimeout(() => this.$emit("play"), 200)
     },
     close() {
-      if (this.player) {
-        this.player.stopVideo()
-        this.updateVideoProgress()
-        this.updateSettings()
-      }
+      this.updateVideoProgress()
+      this.updateSettings()
       this.$emit("close")
-    },
-    getInitialEndScreenState() {
-      if (this.progress >= 1) {
-        return true
-      }
-      if (this.player) {
-        const viewedAmount = this.progress * this.player.getDuration()
-        return this.player.getDuration() <= viewedAmount
-      }
-      return false
     },
     updateVideoProgress(ended = false) {
       if (this.player) {
-        let amountViewed
-        if (ended) {
-          amountViewed = 1
-        } else {
-          amountViewed = this.player.getCurrentTime() / this.player.getDuration()
-        }
-        this.$emit("timeupdate", amountViewed)
+        const currentTime = this.player.getCurrentTime()
+        const duration = this.player.getDuration()
 
-        if (amountViewed >= ALLOW_SKIP_THRESHOLD) {
-          this.$emit("complete")
+        if (Math.abs(currentTime - this.lastTime) > SEEK_THRESHOLD) {
+          this.$emit("seeked", { currentTime })
+          setTimeout(() => this.$emit("play"), 200)
+        } else {
+          this.$emit("timeupdate", {
+            amountViewed: ended ? 1 : currentTime / duration,
+            currentTime: ended ? duration : currentTime,
+          })
         }
-        if (amountViewed >= 1) {
-          this.showEndScreen = true
-        }
+        this.lastTime = currentTime
       }
     },
     handlePause() {
@@ -181,22 +137,34 @@ export default {
       client.recordAnalyticsEvent("user", "pause", "yt-video", id, {
         time: progress * mediaDuration,
       })
+      this.$emit("pause")
     },
     handlePlay() {
-      if (!this.playedOnce && this.autoplay) {
-        this.playedOnce = true
-        return
-      }
       const { id, progress, mediaDuration } = this.node
       client.recordAnalyticsEvent("user", "play", "yt-video", id, {
         time: progress * mediaDuration,
       })
+      this.$emit("play")
+    },
+    /**
+     * The YouTube API doesn't expose a `timeupdate` event, so we have to track
+     * our own updates by setting an interval.
+     */
+    startInterval() {
+      if (this.interval) {
+        clearInterval(this.interval)
+      }
+      this.interval = setInterval(() => this.updateVideoProgress(), 200)
+    },
+    stopInterval() {
+      if (this.interval) {
+        clearInterval(this.interval)
+      }
     },
     handleEnd() {
       // Video current time may be a few milliseconds short and so won't mark it as complete
       this.updateVideoProgress(true)
       this.updateSettings()
-      this.showEndScreen = true
     },
     applySettings() {
       if (!this.h5pSettings || Object.keys(this.h5pSettings).length === 0) return

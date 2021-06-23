@@ -133,7 +133,7 @@ function setDatasetProgress(dataset, progress) {
       const { content } = nodeProgress
       if (content) {
         node.quiz = content.quiz
-        node.typeData = content.typeData
+        node.typeData = { ...node.typeData, ...content.typeData }
       }
 
       if (node.mediaType !== "multi-content") {

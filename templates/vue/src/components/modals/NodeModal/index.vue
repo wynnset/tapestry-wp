@@ -47,8 +47,8 @@
             @click="changeTab('content')"
           >
             <content-form
-              :parent="parent"
               :node="node"
+              :parent="parent"
               :actionType="type"
               :maxDescriptionLength="maxDescriptionLength"
               @load="videoLoaded = true"
@@ -758,8 +758,26 @@ export default {
       }
       await this.updateLockedStatus()
       this.loading = false
+
+      /**
+       * Sometimes changes in the parent node causes changes in child nodes. For
+       * example, when a node goes from a video to a non-video, all child popups
+       * should be invalidated.
+       */
+      this.updateChildren()
       if (!this.hasSubmissionError) {
         this.close()
+      }
+    },
+    updateChildren() {
+      if (!["h5p", "video"].includes(this.node.mediaType)) {
+        const children = this.getDirectChildren(this.node.id)
+        children.forEach(childId => {
+          const childNode = this.getNode(childId)
+          if (childNode && childNode.popup) {
+            this.updateNode({ id: childId, newNode: { popup: null } })
+          }
+        })
       }
     },
     getRandomNumber(min, max) {
@@ -838,6 +856,15 @@ export default {
             this.maxDescriptionLength +
             " characters"
         )
+      }
+
+      if (this.node.popup) {
+        const { time } = this.node.popup
+        if (time === "") {
+          errMsgs.push(`Please enter a time for your popup.`)
+        } else if (time <= 0) {
+          errMsgs.push(`Please enter a time greater than 0.`)
+        }
       }
 
       const quiz = this.node.quiz

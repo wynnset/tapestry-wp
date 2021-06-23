@@ -1,5 +1,11 @@
 <template>
-  <div data-qa="end-screen" class="end-screen">
+  <activity-screen
+    v-if="showActivityScreen"
+    :id="node.id"
+    @back="showActivityScreen = false"
+    @close="$emit('close')"
+  />
+  <div v-else data-qa="end-screen" class="end-screen">
     <button v-if="showQuizButton" @click="handleClick($event, 'show-quiz')">
       <i class="fas fa-question-circle fa-4x"></i>
       <p>{{ buttonText }}</p>
@@ -17,14 +23,23 @@
 
 <script>
 import client from "@/services/TapestryAPI"
+import ActivityScreen from "./ActivityScreen"
 
 export default {
   name: "end-screen",
+  components: {
+    ActivityScreen,
+  },
   props: {
     node: {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      showActivityScreen: false,
+    }
   },
   computed: {
     showQuizButton() {
@@ -41,7 +56,12 @@ export default {
         x: evt.clientX,
         y: evt.clientY,
       })
-      this.$emit(type)
+
+      if (type === "show-quiz") {
+        this.showActivityScreen = true
+      } else {
+        this.$emit(type)
+      }
     },
   },
 }

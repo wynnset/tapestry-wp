@@ -78,6 +78,9 @@ export default {
     mediaUrl(val) {
       this.node.typeData.mediaURL = val
     },
+    selectedH5p(selectedH5p) {
+      this.node.typeData.h5pMeta = selectedH5p
+    },
   },
   mounted() {
     H5PApi.getAllContent().then(options => {
