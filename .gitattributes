@@ -1,2 +1,4 @@
 wp-init.sh text eol=lf
 uploads.ini text eol=lf
+fixtures/h5p_content.tar.gz filter=lfs diff=lfs merge=lfs -text
+fixtures/h5p_content_linux.tar.gz filter=lfs diff=lfs merge=lfs -text

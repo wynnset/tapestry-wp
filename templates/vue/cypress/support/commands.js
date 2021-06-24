@@ -159,12 +159,12 @@ Cypress.Commands.add("openModal", (type, id) => {
   }
 })
 
-Cypress.Commands.add("submitModal", () => {
+Cypress.Commands.add("submitModal", (timeout = 10000) => {
   cy.server()
   cy.route("PUT", `**/nodes/**/permissions`).as("editPermissions")
 
   cy.getByTestId("submit-node-modal").click()
-  cy.getByTestId("node-modal", { timeout: 10000 }).should("not.be.visible")
+  cy.getByTestId("node-modal", { timeout: timeout }).should("not.be.visible")
 })
 
 Cypress.Commands.add("submitSettingsModal", () => {
@@ -195,4 +195,25 @@ Cypress.Commands.add("getByTestId", (testId, ...args) =>
 
 Cypress.Commands.add("getEditable", testId =>
   cy.getByTestId(testId).find("[contenteditable=true]")
+)
+
+// Get an iFrame subject by id and execute optional
+// assertions on its document
+// Limitation: cannot do cypress commands on subjects within the frame,
+// only make assertions on the static DOM object
+Cypress.Commands.add("getIFrame", (id, fn = fr => fr) =>
+  cy
+    .get(`iframe[id="${id}"]`)
+    // Assertions like this will fail
+    // .find("body")
+    // .should("exist")
+    // However,
+    .should(frame => {
+      // this assertion passes
+      // (reference: https://github.com/danteoh/cypress-iframe-test/blob/master/cypress/integration/iframe_spec.js)
+      expect(frame.contents().find("body")).to.exist
+
+      // and we can do arbitrary assertions on the contents
+      fn(frame.contents())
+    })
 )

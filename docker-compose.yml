@@ -8,6 +8,7 @@ services:
     volumes:
       - ./config/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini
       - ./data/wp:/var/www/html # Full wordpress project
+      - ${UPLOAD_MOUNTPOINT}:/var/www/html/wp-content/uploads
       - ./:/var/www/html/wp-content/plugins/tapestry-wp
     environment:
       WORDPRESS_DB_HOST: db
@@ -59,7 +60,7 @@ services:
       ]
     volumes:
       - ./data/db:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/mysql
+      - ${DB_MOUNTPOINT}:/var/lib/mysql
     environment:
       MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"

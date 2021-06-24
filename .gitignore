@@ -7,3 +7,6 @@ cypress.json
 
 data/
 bin/config.sh
+
+fixtures/data
+fixtures/uploads

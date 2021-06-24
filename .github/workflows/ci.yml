@@ -32,6 +32,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - name: Launch containers
         run: docker-compose up -d
       - name: Wait for containers to be ready
@@ -40,14 +42,25 @@ jobs:
         run: bash ./bin/await-containers.sh
       - name: Setup WP
         run: sh ./bin/install.sh
+      - name: Stop containers
+        run: docker-compose down
       - name: Setup link preview config
         working-directory: templates/vue
         env:
           LINK_KEY: ${{ secrets.LINK_PREVIEW_API_KEY }}
         run: echo "LINK_PREVIEW_API_KEY=$LINK_KEY" > .env
+      - name: Load fixtures
+        run: bash ./bin/load-fixture.bash h5p_content_linux
+      - name: Launch containers with fixtures
+        run: docker-compose --env-file ./fixtures/.env up -d
+      - name: View container logs
+        run: docker-compose logs
       - name: Change content directory ownership
         working-directory: data/wp
-        run: sudo chown www-data:www-data wp-content
+        run: sudo chown -R www-data:www-data wp-content
+      - name: Change fixture uploads directory ownership
+        working-directory: fixtures
+        run: sudo chown -R www-data:www-data uploads
       - name: Setup cypress.json
         working-directory: templates/vue
         run: cp cypress.gha.json cypress.json

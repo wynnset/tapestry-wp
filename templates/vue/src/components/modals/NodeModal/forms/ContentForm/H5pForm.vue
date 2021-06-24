@@ -7,6 +7,7 @@
         item-value="id"
         empty-message="There's no H5P content yet. Please add one in your WP dashboard."
         :options="options"
+        data-qa="h5p-content-select"
       >
         <template v-slot="{ option }">
           <p>

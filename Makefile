@@ -5,8 +5,15 @@ start:
 start-wp:
 	docker-compose up -d
 
+start-wp-fixtures:
+	docker-compose --env-file ./fixtures/.env up -d
+
 start-app:
 	cd templates/vue && npm start
+
+start-fixtures:
+	make start-wp-fixtures
+	make start-app
 
 init:
 	make start-wp
