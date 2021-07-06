@@ -140,6 +140,22 @@
                 Audio recorder
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="question.answerTypes.dragDrop.enabled"
+                data-qa="question-answer-dragdrop"
+                switch
+              >
+                Drag and drop
+              </b-form-checkbox>
+              <div class="mt-2 pl-4 ml-2">
+                <drag-drop-form
+                  v-if="question.answerTypes.dragDrop.enabled"
+                  :node="node"
+                  :question="question"
+                />
+              </div>
+            </b-form-group>
           </b-card>
           <b-card
             sub-title="Confirmation customization"
@@ -176,6 +192,7 @@ import { mapState } from "vuex"
 import Combobox from "@/components/modals/common/Combobox"
 import Helpers from "@/utils/Helpers"
 import RichTextForm from "./RichTextForm"
+import DragDropForm from "./DragAndDropForm"
 
 const defaultQuestion = {
   text: "",
@@ -194,6 +211,9 @@ const defaultQuestion = {
     audio: {
       enabled: false,
     },
+    dragDrop: {
+      enabled: false,
+    },
   },
   confirmation: {
     title: "",
@@ -206,6 +226,7 @@ export default {
   components: {
     Combobox,
     RichTextForm,
+    DragDropForm,
   },
   props: {
     node: {

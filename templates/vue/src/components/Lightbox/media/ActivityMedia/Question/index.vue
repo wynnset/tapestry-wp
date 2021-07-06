@@ -22,6 +22,7 @@
             :key="previousAnswer[0]"
             :type="previousAnswer[0]"
             :answerData="previousAnswer[1]"
+            :question="getQuestion(question.followUp.questionId)"
           ></completed-activity-media>
         </div>
         <div v-else>
@@ -53,6 +54,13 @@
             :node="node"
             @submit="handleSubmit"
           />
+          <drag-drop-question
+            v-else-if="formType === 'dragDrop'"
+            :question="question"
+            :node="node"
+            :answer="answer"
+            @submit="handleSubmit"
+          />
         </div>
         <div v-else class="question-answer-types">
           <p class="question-answer-text">I want to answer with...</p>
@@ -74,6 +82,14 @@
             >
               audio
             </answer-button>
+            <answer-button
+              v-if="question.answerTypes.dragDrop.enabled"
+              :completed="dragDropFormCompleted"
+              icon="drag and drop"
+              @click="openForm('dragDrop')"
+            >
+              drag/drop
+            </answer-button>
           </div>
         </div>
       </div>
@@ -87,6 +103,7 @@ import client from "@/services/TapestryAPI"
 import AnswerButton from "./AnswerButton"
 import AudioRecorder from "./AudioRecorder"
 import TextQuestion from "./TextQuestion"
+import DragDropQuestion from "./DragDropQuestion"
 import Loading from "@/components/common/Loading"
 import CompletedActivityMedia from "../../common/CompletedActivityMedia"
 import * as wp from "@/services/wp"
@@ -97,6 +114,7 @@ export default {
     AnswerButton,
     AudioRecorder,
     TextQuestion,
+    DragDropQuestion,
     Loading,
     CompletedActivityMedia,
   },
@@ -119,7 +137,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getAnswers"]),
+    ...mapGetters(["getAnswers", "getQuestion"]),
     ...mapState(["userAnswers"]),
     isLoggedIn() {
       return wp.isLoggedIn()
@@ -168,6 +186,15 @@ export default {
       if (
         this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
           ?.audio
+      ) {
+        return true
+      }
+      return false
+    },
+    dragDropFormCompleted() {
+      if (
+        this.userAnswers?.[this.node.id]?.activity?.[this.question.id]?.answers
+          ?.dragDrop
       ) {
         return true
       }

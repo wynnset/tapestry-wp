@@ -13,6 +13,7 @@
           <completed-activity-media
             :type="questionAnswer[0]"
             :answerData="questionAnswer[1]"
+            :question="question"
           ></completed-activity-media>
         </b-tab>
       </b-tabs>
