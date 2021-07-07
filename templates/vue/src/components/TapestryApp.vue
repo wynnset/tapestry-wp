@@ -6,7 +6,7 @@
       :is-sidebar-open="isSidebarOpen"
       data-qa="tapestry-map"
     />
-    <tapestry-main v-else ref="graph" :viewBox="viewBox" />
+    <tapestry-main v-else-if="!tydeModeEnabled" ref="graph" :viewBox="viewBox" />
   </div>
 </template>
 
@@ -18,6 +18,7 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
+import { getCurrentUser, canEditTapestry } from "@/services/wp"
 
 export default {
   components: {
@@ -33,11 +34,15 @@ export default {
   },
   computed: {
     ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
+    },
+    tydeModeEnabled() {
+      return !canEditTapestry() && this.settings.tydeModeEnabled
     },
   },
   watch: {
@@ -56,9 +61,11 @@ export default {
       this.editNode(id)
     })
     client.recordAnalyticsEvent("app", "load", "tapestry")
+
+    this.setupTydeView()
   },
   methods: {
-    ...mapMutations(["select", "unselect", "clearSelection"]),
+    ...mapMutations(["select", "unselect", "clearSelection", "setDisplayTydeMode"]),
     updateViewBox() {
       const MAX_RADIUS = 240
       const MIN_TAPESTRY_WIDTH_FACTOR = 1.5
@@ -147,6 +154,22 @@ export default {
         params: { nodeId: id, type: "edit", tab: "content" },
         query: this.$route.query,
       })
+    },
+    setupTydeView() {
+      if (this.tydeModeEnabled) {
+        /* NOTE: Opening the default Node for a specific role 
+             in fullscreen only if this role cannot edit the 
+             default node, otherwise the regular tapestry will
+             open
+      */
+        const userMainRole = getCurrentUser().roles[0] || "public"
+        const defaultNodeId = this.settings.tydeModeDefualtNodes[userMainRole]
+        this.$router.push({
+          name: names.LIGHTBOX,
+          params: { nodeId: defaultNodeId },
+          query: this.$route.query,
+        })
+      }
     },
   },
 }

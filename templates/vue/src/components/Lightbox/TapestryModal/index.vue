@@ -11,6 +11,7 @@
             @clicked="$emit('close')"
           />
           <modal-button
+            v-if="showFav"
             icon="heart"
             icon-size="sm"
             :title="isFavourite ? 'Remove from Favourites' : 'Add to Favourites'"
@@ -127,6 +128,7 @@ export default {
 
   &.full-screen {
     .content {
+      border-radius: 0px;
       .buttons-container {
         top: 20px;
         right: 30px;
