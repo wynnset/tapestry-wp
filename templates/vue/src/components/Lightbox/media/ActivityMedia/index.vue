@@ -50,6 +50,7 @@ import client from "@/services/TapestryAPI"
 import Question from "./Question"
 import CompletionScreen from "./CompletionScreen"
 import { mapActions, mapGetters } from "vuex"
+import * as wp from "@/services/wp"
 
 export default {
   name: "activity-media",
@@ -130,11 +131,13 @@ export default {
       const numberCompleted = this.questions.filter(question => question.completed)
         .length
       const progress = numberCompleted / this.node.typeData.activity.questions.length
-      this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
-        if (progress === 1) {
-          this.$emit("complete")
-        }
-      })
+      if (this.performDyadNodeCheck()) {
+        this.updateNodeProgress({ id: this.node.id, progress }).then(() => {
+          if (progress === 1) {
+            this.$emit("complete")
+          }
+        })
+      }
     },
     next() {
       this.showCompletionScreen = false
@@ -155,6 +158,9 @@ export default {
     close() {
       client.recordAnalyticsEvent("user", "close", "activity", this.node.id)
       this.$emit("close")
+    },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
     },
   },
 }

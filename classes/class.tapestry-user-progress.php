@@ -4,6 +4,7 @@
 require_once dirname(__FILE__).'/../interfaces/interface.tapestry-user-progress.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry-node.php';
 require_once dirname(__FILE__).'/../classes/class.tapestry.php';
+require_once dirname(__FILE__).'/../utilities/class.tapestry-user.php';
 
 /**
  * Add/update/retrieve User progress.
@@ -156,13 +157,27 @@ class TapestryUserProgress implements ITapestryUserProgress
         $progress = new stdClass();
         $tapestry = new Tapestry($this->postId);
 
+        $roles = new TapestryUser();
+
         $nodes = $tapestry->setUnlocked($nodeIdArr, $userId);
 
         // Build json object for frontend e.g. {0: 0.1, 1: 0.2} where 0 and 1 are the node IDs
         foreach ($nodes as $node) {
             $nodeId = $node->id;
+            $isDyad = $node->isDyad;
 
             $progress_value = get_user_meta($userId, 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+
+            $user_meta = get_userdata($userId); 
+            $user_roles = $user_meta->roles;
+
+            if ($isDyad && in_array('dyad', $user_roles, true)) {
+                // overwrite $progress_value to that of $teenId
+                // if the user is a parent account
+                $teenId = get_user_meta($userId, 'linked_dyad_user_id');
+                $progress_value = get_user_meta($teenId[0], 'tapestry_'.$this->postId.'_progress_node_'.$nodeId, true);
+            }
+
             $progress->$nodeId = new stdClass();
             if (null !== $progress_value) {
                 $progress->$nodeId->progress = (float) $progress_value;

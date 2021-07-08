@@ -380,6 +380,7 @@ export default class Helpers {
       unlocked: true,
       accessible: true,
       reviewComments: [],
+      isDyad: false,
       popup: null,
     }
     return Helpers.deepMerge(baseNode, overrides)

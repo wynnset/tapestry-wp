@@ -339,3 +339,41 @@ function add_tyde_roles()
         ]
     );
 }
+
+/**
+ * Show the youth user id input if the user is a dyad.
+ */
+function add_dyad_youth_user_field($user)
+{
+    if (in_array('dyad', $user->roles)) : ?>
+        <table class="form-table">
+            <tr>
+                <th><label for="youth_user_id"><?php _e('Linked Youth User ID'); ?></label></th>
+                <td>
+                    <input type="text" name="youth_user_id" id="youth_user_id" value="<?php echo esc_attr(get_the_author_meta('youth_user_id', $user->ID)); ?>" class="regular-text" /><br />
+                    <span class="description"><?php _e("Please enter the user ID for the linked youth user."); ?></span>
+                </td>
+            </tr>
+        </table>
+<?php endif;
+}
+add_action('show_user_profile', 'add_dyad_youth_user_field');
+add_action('edit_user_profile', 'add_dyad_youth_user_field');
+
+/**
+ * Save the youth user id input when updated (if the user is a dyad).
+ */
+function save_dyad_youth_user_field($user_id)
+{
+    if (!current_user_can('edit_user', $user_id)) {
+        return false;
+    }
+    $user = get_user_by('id', $user_id);
+    $youth_user_id = $_POST['youth_user_id'] + 0;
+    if (!in_array('dyad', $user->roles)) {
+        return false;
+    }
+    update_user_meta($user_id, 'linked_dyad_user_id', $youth_user_id);
+}
+add_action('personal_options_update', 'save_dyad_youth_user_field');
+add_action('edit_user_profile_update', 'save_dyad_youth_user_field');

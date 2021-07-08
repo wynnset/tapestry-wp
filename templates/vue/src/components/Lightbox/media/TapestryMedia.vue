@@ -76,6 +76,7 @@ import H5PMedia from "./H5PMedia"
 import ExternalMedia from "./ExternalMedia"
 import ActivityMedia from "./ActivityMedia"
 import WpPostMedia from "./WpPostMedia"
+import * as wp from "@/services/wp"
 
 export default {
   name: "tapestry-media",
@@ -123,10 +124,12 @@ export default {
     },
   },
   beforeDestroy() {
-    this.updateNodeProgress({
-      id: this.nodeId,
-      progress: this.node && this.node.progress,
-    })
+    if (this.performDyadNodeCheck()) {
+      this.updateNodeProgress({
+        id: this.nodeId,
+        progress: this.node && this.node.progress,
+      })
+    }
   },
   methods: {
     ...mapActions(["updateNodeProgress"]),
@@ -143,10 +146,17 @@ export default {
       this.$emit("load", args)
     },
     updateProgress({ amountViewed }) {
-      this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
+      if (this.performDyadNodeCheck()) {
+        this.updateNodeProgress({ id: this.nodeId, progress: amountViewed })
+      }
     },
     complete(nodeId) {
-      this.$emit("complete", nodeId)
+      if (this.performDyadNodeCheck()) {
+        this.$emit("complete", nodeId)
+      }
+    },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
     },
   },
 }

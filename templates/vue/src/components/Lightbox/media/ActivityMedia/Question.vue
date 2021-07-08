@@ -232,6 +232,9 @@ export default {
       this.formType = answerType
       this.formOpened = true
     },
+    performDyadNodeCheck() {
+      return wp.getCurrentUser().roles.includes("youth") || !this.node.isDyad
+    },
     async handleSubmit(formData) {
       this.formOpened = false
       this.submitting = true
@@ -258,12 +261,14 @@ export default {
           break
         }
       }
-      await this.completeQuestion({
-        nodeId: this.node.id,
-        questionId: this.question.id,
-        answerType: this.formType,
-        answer: submittedAnswer,
-      })
+      if (this.performDyadNodeCheck()) {
+        await this.completeQuestion({
+          nodeId: this.node.id,
+          questionId: this.question.id,
+          answerType: this.formType,
+          answer: submittedAnswer,
+        })
+      }
       this.submitting = false
 
       client.recordAnalyticsEvent("user", "submit", "question", this.question.id, {

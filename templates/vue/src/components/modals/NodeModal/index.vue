@@ -90,6 +90,8 @@
             </b-card>
             <h6 class="mt-4 mb-3">Lock Node</h6>
             <conditions-form :node="node" />
+            <h6 class="mt-4 mb-3">Dyad Node Behaviour</h6>
+            <dyad-form :node="node" />
           </b-tab>
           <b-tab
             v-if="node.mediaType === 'h5p' || node.mediaType === 'video'"
@@ -254,6 +256,7 @@ import ActivityForm from "./forms/ContentForm/ActivityForm"
 import AppearanceForm from "./forms/AppearanceForm"
 import BehaviourForm from "./forms/BehaviourForm"
 import ConditionsForm from "./forms/ConditionsForm"
+import DyadForm from "./forms/DyadForm"
 import CoordinatesForm from "./forms/CoordinatesForm"
 import ContentForm from "./forms/ContentForm"
 import CopyrightForm from "./forms/CopyrightForm"
@@ -284,6 +287,7 @@ export default {
     ContentForm,
     ActivityForm,
     ConditionsForm,
+    DyadForm,
     CoordinatesForm,
     CopyrightForm,
     ReferencesForm,
