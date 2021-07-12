@@ -23,6 +23,17 @@ export async function updateH5pSettings({ commit, dispatch }, newSettings) {
   }
 }
 
+// userSettings
+
+export async function updateUserSettings({ commit, dispatch }, userSettings) {
+  try {
+    await client.updateUserSettings(JSON.stringify(userSettings))
+    commit("addAvatar", userSettings.avatar)
+  } catch (error) {
+    dispatch("addApiError", error)
+  }
+}
+
 // nodes
 export async function addNode({ commit, dispatch, getters, state }, newNode) {
   try {

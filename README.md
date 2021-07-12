@@ -46,3 +46,18 @@ It's strongly recommended you complete this to get link previews working for the
     where `<key>` is the key you generated.
 
 If you complete these steps before running `npm run build`, you will have link previews working.
+
+### Enabling Avatars in TYDE Mode
+
+To enable Avatars throughout the application, follow these steps: 
+
+1. If not done already, in the `templates/vue` directory, create a `.env` file.
+2. Add the following line to enable Avatars:
+    ```
+   	VUE_APP_AVATARS=TRUE
+
+    ```
+Save the file and restart the server with `npm start` for the changes to take place. 
+
+3. To disable Avatars, set `VUE_APP_AVATARS=FALSE`
+

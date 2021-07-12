@@ -12,6 +12,7 @@ export const routes = [
   routeConfig.multiContent,
   routeConfig.nestedMultiContent,
   routeConfig.settings,
+  routeConfig.userSettings,
   ...routeConfig.redirects,
   routeConfig.modal,
 ]

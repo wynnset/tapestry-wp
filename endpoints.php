@@ -206,6 +206,20 @@ $REST_API_ENDPOINTS = [
             'callback' => 'updateUserH5PSettingsByPostId',
         ],
     ],
+    'GET_USER_AVATAR' => (object) [
+        'ROUTE' => '/users/userSettings/avatar',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_GET_METHOD,
+            'callback' => 'getUserAvatar',
+        ],
+    ],
+    'UPDATE_USER_SETTINGS' => (object) [
+        'ROUTE' => '/users/userSettings',
+        'ARGUMENTS' => [
+            'methods' => $REST_API_PUT_METHOD,
+            'callback' => 'updateUserSettings',
+        ],
+    ],
     'POST_USER_AUDIO' => (object) [
         'ROUTE' => 'users/activity/audio/tapestries/(?P<tapestryPostId>[\d]+)/nodes/(?P<nodeMetaId>[\d]+)',
         'ARGUMENTS' => [
@@ -1223,6 +1237,28 @@ function getUserH5PSettingsByPostId($request)
         $userProgress = new TapestryUserProgress($postId);
 
         return $userProgress->getH5PSettings();
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+function updateUserSettings($request)
+{
+    $userSettings = $request->get_body();
+    try {
+        $userProgress = new TapestryUserProgress();
+        $userProgress->updateUserSettings($userSettings);
+    } catch (TapestryError $e) {
+        return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
+    }
+}
+
+
+function getUserAvatar($request)
+{
+    try {
+        $userProgress = new TapestryUserProgress();
+        return $userProgress->getAvatar();
     } catch (TapestryError $e) {
         return new WP_Error($e->getCode(), $e->getMessage(), $e->getStatus());
     }

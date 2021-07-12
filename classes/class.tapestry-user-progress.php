@@ -120,6 +120,28 @@ class TapestryUserProgress implements ITapestryUserProgress
         return $this->_getUserH5PSettings();
     }
 
+    /**
+     * Update the user's avatar.
+     *
+     * @param string $userSettings stores avatar
+     *
+     * @return null
+     */
+    public function updateUserSettings($userSettings)
+    {
+        $this->_updateUserSettings($userSettings);
+    }
+
+    /**
+     * Get the user's avatar.
+     *
+     * @return object avatar $avatar
+     */
+    public function getAvatar()
+    {
+        return $this->_getAvatar();
+    }
+
     public function isCompleted($nodeId, $userId)
     {
         $nodeMetadata = get_metadata_by_mid('post', $nodeId)->meta_value;
@@ -214,6 +236,20 @@ class TapestryUserProgress implements ITapestryUserProgress
         $settings = get_user_meta($this->_userId, 'tapestry_h5p_setting_'.$this->postId, true);
 
         return $settings ? json_decode($settings) : (object) [];
+    }
+
+    private function _updateUserSettings($userSettings)
+    {
+        update_user_meta($this->_userId, 'user_settings', $userSettings);
+    }
+
+    private function _getAvatar()
+    {
+        $userSettings = get_user_meta($this->_userId, 'user_settings', true);
+        $userSettingsObject = json_decode($userSettings);
+        $avatar = $userSettingsObject->avatar;
+
+        return $avatar ? $avatar : (object) [];
     }
 
     /**

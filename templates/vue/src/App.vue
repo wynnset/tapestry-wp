@@ -69,8 +69,10 @@ export default {
           that.loggedIn = data["wp-auth-check"]
         })
       })
+      Promise.resolve(client.getAvatar()).then(savedAvatar => {
+        this.addAvatar(savedAvatar.data)
+      })
     }
-
     window.addEventListener("click", this.recordAnalytics)
     const data = [client.getTapestry(), client.getUserProgress()]
     Promise.all(data).then(([dataset, progress]) => {
@@ -88,7 +90,7 @@ export default {
     window.removeEventListener("click", this.recordAnalytics)
   },
   methods: {
-    ...mapMutations(["init"]),
+    ...mapMutations(["init", "addAvatar"]),
     refresh() {
       this.$router.go()
     },

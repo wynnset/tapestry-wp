@@ -18,6 +18,7 @@ import TapestryMain from "./TapestryMain"
 import { mapMutations, mapState } from "vuex"
 import TapestryMap from "./TapestryMap"
 import Helpers from "@/utils/Helpers"
+import { isLoggedIn } from "@/services/wp"
 
 export default {
   components: {
@@ -32,12 +33,18 @@ export default {
     }
   },
   computed: {
-    ...mapState(["nodes", "links", "selection", "settings", "rootId"]),
+    ...mapState(["nodes", "links", "selection", "settings", "rootId", "avatar"]),
     isSidebarOpen() {
       return Boolean(this.$route.query.sidebar)
     },
     analyticsEnabled() {
       return this.settings.analyticsEnabled
+    },
+    hasAvatar() {
+      return !(!this.avatar || Object.keys(this.avatar).length === 0)
+    },
+    avatarsEnabled() {
+      return isLoggedIn() && process.env.VUE_APP_AVATARS === "TRUE"
     },
   },
   watch: {
@@ -49,6 +56,13 @@ export default {
     },
   },
   mounted() {
+    if (!this.hasAvatar && this.avatarsEnabled) {
+      this.$router.push({
+        name: open ? names.USERSETTINGS : names.APP,
+        params: { nodeId: this.$route.params.nodeId, tab: "avatar" },
+        query: this.$route.query,
+      })
+    }
     this.$root.$on("open-node", id => {
       this.openNode(id)
     })
