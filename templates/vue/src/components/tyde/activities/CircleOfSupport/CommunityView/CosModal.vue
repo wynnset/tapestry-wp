@@ -1,7 +1,7 @@
 <template>
-  <div v-show="show" class="modal">
+  <div v-show="show" class="modal ob-font">
     <div class="overlay" @click="$emit('change', false)"></div>
-    <div class="content">
+    <div class="content center">
       <slot></slot>
     </div>
   </div>
@@ -30,10 +30,8 @@ export default {
   bottom: 0;
   right: 0;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
 }
-
 .overlay {
   position: absolute;
   top: 0;
@@ -43,14 +41,12 @@ export default {
   background: black;
   opacity: 0.4;
 }
-
 .content {
   position: relative;
   padding: 2rem;
   background: white;
   border: var(--cos-border);
   border-radius: 1rem;
-  max-width: 24rem;
-  margin-top: 4rem;
+  max-width: 700px;
 }
 </style>

@@ -1,0 +1,51 @@
+$onbording-title-color: black;
+$onbording-secondary-color: #7f88af;
+$onbording-border-color: #d8d8d8;
+
+.center {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ob-title {
+  color: $onbording-title-color;
+}
+
+.ob-secondary {
+  color: $onbording-secondary-color;
+}
+
+.ob-border {
+  color: $onbording-border-color;
+}
+
+.ob-font {
+  * {
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+  }
+}
+
+.ob-connection {
+  position: relative;
+  padding: 0.25em;
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  cursor: default;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  background: white;
+}
+
+.ob-connection-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--size, 1rem);
+  border-radius: 0.5em;
+  cursor: pointer;
+  transform: translate(var(--x), var(--y));
+}

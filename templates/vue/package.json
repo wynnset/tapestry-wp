@@ -46,7 +46,8 @@
     "vue-swatches": "^2.1.1",
     "vue-youtube-embed": "^2.2.2",
     "vue2-leaflet": "^2.5.2",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "xstate": "^4.18.0"
   },
   "browserslist": [
     "> 1%",

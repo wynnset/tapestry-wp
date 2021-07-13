@@ -5,7 +5,7 @@
     :style="{ opacity: isDragging ? 0.2 : 1, '--size': fontSize }"
     @click="$emit('click')"
   >
-    <p>{{ connection.name }}</p>
+    <p class="ob-connection">{{ connection.name }}</p>
     <h1>{{ connection.avatar }}</h1>
     <ul v-if="variant !== 'name'" class="community-list">
       <li
@@ -19,7 +19,6 @@
 
 <script>
 import * as d3 from "d3"
-
 export default {
   props: {
     connection: {
@@ -103,7 +102,6 @@ export default {
   border-radius: 0.5em;
   cursor: pointer;
   transform: translate(var(--x), var(--y));
-
   p {
     position: relative;
     padding: 0.25em;
@@ -115,17 +113,14 @@ export default {
     max-width: 100%;
     background: white;
   }
-
   h1 {
     font-size: 4em;
     cursor: default;
   }
-
   &:hover {
     background: #f0f0f0;
   }
 }
-
 .community-list {
   margin: 0;
   padding: 0;
@@ -134,7 +129,6 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-
   li {
     height: 1em;
     width: 1em;
