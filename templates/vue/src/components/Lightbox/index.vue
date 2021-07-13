@@ -16,6 +16,7 @@
       :node="node"
       :row-id="rowId"
       :sub-row-id="subRowId"
+      :activeMenuNode="activeMenuNode"
       @close="handleAutoClose"
       @complete="complete"
     />
@@ -24,6 +25,7 @@
       :node="node"
       :rowRefs="rowRefs"
       :dimensions="dimensions"
+      @changeActiveMenu="setActiveMenuNode"
     />
     <tapestry-media
       v-if="node.mediaType !== 'multi-content'"
@@ -82,6 +84,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
+      activeMenuNode: this.nodeId,
     }
   },
   computed: {
@@ -291,6 +294,9 @@ export default {
         width: this.lightboxDimensions.width,
         height: this.lightboxDimensions.height,
       }
+    },
+    setActiveMenuNode(nodeId) {
+      this.activeMenuNode = nodeId
     },
   },
 }

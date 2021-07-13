@@ -95,6 +95,15 @@
                 Hide media button
               </b-form-checkbox>
             </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-show="hasPageMultiContentParent"
+                v-model="node.typeData.isSecondaryNode"
+                data-qa="node-appearance-secondary-node"
+              >
+                Is secondary node
+              </b-form-checkbox>
+            </b-form-group>
           </b-col>
         </b-row>
       </b-container>
@@ -141,6 +150,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import FileUpload from "@/components/modals/common/FileUpload"
 import ColorPicker from "@/components/modals/common/ColorPicker"
 import TinyColor from "tinycolor2"
@@ -163,6 +173,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["getParent", "getNode"]),
     readability() {
       return Math.round(
         (Math.log(
@@ -180,6 +191,16 @@ export default {
         return "warning"
       }
       return "success"
+    },
+    hasPageMultiContentParent() {
+      let parentNode = this.getNode(this.getParent(this.node.id))
+      if (parentNode) {
+        return (
+          parentNode.mediaType === "multi-content" &&
+          parentNode.presentationStyle === "page"
+        )
+      }
+      return false
     },
   },
   watch: {

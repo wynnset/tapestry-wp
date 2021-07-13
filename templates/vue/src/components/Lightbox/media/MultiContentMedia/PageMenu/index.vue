@@ -35,16 +35,38 @@
           },
         ]"
       >
-        <ul class="page-menu-item fa-ul">
-          <page-menu-item
-            v-for="row in rows"
-            :key="row.node.id"
-            :node="row.node"
-            :lockRows="lockRows"
-            :disabled="disabledRow(row.node)"
-            @scroll-to="scrollToRef"
-          />
-        </ul>
+        <div v-for="(menu, index) in menuGroups" :key="index" class="menu-wrapper">
+          <b-card class="menu">
+            <div>
+              <b-card-text v-if="index === 0">
+                {{ getMenuName(index) }}
+              </b-card-text>
+              <b-card-text v-else v-b-toggle="`collapse-${index}`">
+                {{ getMenuName(index) }}
+              </b-card-text>
+            </div>
+            <b-collapse
+              :id="`collapse-${index}`"
+              :visible="index === 0"
+              class="mt-2"
+            >
+              <ul
+                class="page-menu-item fa-ul"
+                @click="changeActiveMenu(menu[0].node.id)"
+              >
+                <page-menu-item
+                  v-for="row in menu"
+                  :key="row.node.id"
+                  :node="row.node"
+                  :lockRows="lockRows"
+                  :disabled="disabledRow(row.node)"
+                  style="z-index: 10"
+                  @scroll-to="scrollToRef"
+                />
+              </ul>
+            </b-collapse>
+          </b-card>
+        </div>
       </div>
     </aside>
   </div>
@@ -98,6 +120,21 @@ export default {
         })
         .filter(row => !row.node.popup)
     },
+    menuGroups() {
+      const menu = []
+      const mainMenu = []
+      this.rows.forEach(row => {
+        if (row.node.typeData.isSecondaryNode) {
+          let subMenu = []
+          subMenu.push(row)
+          menu.push(subMenu)
+        } else {
+          mainMenu.push(row)
+        }
+      })
+      menu.unshift(mainMenu)
+      return menu
+    },
     lockRows() {
       return this.node.typeData.lockRows
     },
@@ -121,6 +158,7 @@ export default {
         },
       })
     }
+    this.$emit("changeActiveMenu", this.menuGroups[0][0].node.id)
   },
   methods: {
     disabledRow(node) {
@@ -158,6 +196,16 @@ export default {
         }
       })
     },
+    getMenuName(index) {
+      if (index === 0) {
+        return this.node.title
+      } else {
+        return this.menuGroups[index][0].node.title
+      }
+    },
+    changeActiveMenu(nodeId) {
+      this.$emit("changeActiveMenu", nodeId)
+    },
   },
 }
 </script>
@@ -166,7 +214,7 @@ export default {
 .page-nav-wrapper {
   .page-nav {
     position: relative;
-    color: white;
+    color: black;
     background: #5d656c;
     padding: 2.2rem 1.5rem;
     transform: translateY(0);
@@ -249,6 +297,20 @@ export default {
         display: none;
       }
     }
+  }
+
+  .menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .menu {
+    z-index: 100;
+    position: relative;
+    float: none;
+    background: white;
   }
 }
 </style>
