@@ -965,7 +965,32 @@ export default {
         if (!validPreviousAnswers) {
           errMsgs.push("Please select a previous activity to display")
         }
-
+        if (
+          this.node.typeData.activity.questions[0].answerTypes.text.allowMultiple
+        ) {
+          let listQuestion = this.node.typeData.activity.questions[0].answerTypes
+            .text
+          let minValue = parseInt(listQuestion.minFields, 10)
+          let maxValue = parseInt(listQuestion.maxFields, 10)
+          if (!Number.isInteger(minValue)) {
+            errMsgs.push(
+              "Please enter a valid number as the minimum number of fields"
+            )
+          } else if (minValue < 1) {
+            errMsgs.push("Minimum number of fields must be >= 1")
+          }
+          if (!Number.isInteger(maxValue)) {
+            errMsgs.push(
+              "Please enter a valid number as the maximum number of fields"
+            )
+          } else if (maxValue < minValue) {
+            errMsgs.push(
+              "Please ensure minimum number of fields is less than or equal to the maximum number of fields"
+            )
+          } else if (maxValue > 100) {
+            errMsgs.push("Maximum number of fields must be less than 100")
+          }
+        }
         const validMultipleChoiceValues = this.isMultipleChoiceValueValid
         if (!validMultipleChoiceValues) {
           errMsgs.push("Please enter a text for all multiple choice options")

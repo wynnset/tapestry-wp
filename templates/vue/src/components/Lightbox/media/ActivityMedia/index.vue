@@ -102,7 +102,8 @@ export default {
   mounted() {
     this.$emit("change:dimensions", {
       width: this.dimensions.width,
-      height: this.$refs.activity.clientHeight - 100,
+      height:
+        this.$refs.activity.clientHeight - (this.context === "lightbox" ? 0 : 100),
     })
     this.$emit("load")
   },

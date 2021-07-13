@@ -99,7 +99,10 @@
                 Text entry
               </b-form-checkbox>
               <div v-if="question.answerTypes.text.enabled" class="mt-2 pl-4 ml-2">
-                <b-form-radio-group v-model="question.answerTypes.text.isMultiLine">
+                <b-form-radio-group
+                  v-model="question.answerTypes.text.isMultiLine"
+                  @change="disableList(question)"
+                >
                   <b-form-radio
                     :data-qa="`question-answer-text-multi-${index}`"
                     name="multi-line"
@@ -128,6 +131,49 @@
                     v-model="question.answerTypes.text.placeholder"
                     :data-qa="`question-answer-text-single-placeholder-${index}`"
                   ></b-form-input>
+                  <b-form-checkbox
+                    v-model="question.answerTypes.text.allowMultiple"
+                    class="mt-2"
+                    data-qa="enable-list-checkbox"
+                  >
+                    Allow entering multiple values
+                  </b-form-checkbox>
+                  <div
+                    v-if="question.answerTypes.text.allowMultiple"
+                    class="mt-2 pl-4 list-options"
+                  >
+                    <b-row>
+                      <b-col>
+                        <b-form-group
+                          label-cols-sm="12"
+                          label-cols-lg="4"
+                          content-cols-sm
+                          content-cols-lg="6"
+                          description="How many answers would you like users to provide?"
+                          label="Number of answers"
+                          label-for="input-horizontal"
+                        >
+                          <b-input-group prepend="Min:">
+                            <b-form-input
+                              id="min-field"
+                              v-model="question.answerTypes.text.minFields"
+                              data-qa="min-list-fields-input"
+                              type="number"
+                            ></b-form-input>
+                            <b-input-group-prepend is-text>
+                              Max:
+                            </b-input-group-prepend>
+                            <b-form-input
+                              id="max-field"
+                              v-model="question.answerTypes.text.maxFields"
+                              data-qa="max-list-fields-input"
+                              type="number"
+                            ></b-form-input>
+                          </b-input-group>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
+                  </div>
                 </div>
               </div>
             </b-form-group>
@@ -209,6 +255,9 @@ const defaultQuestion = {
       enabled: false,
       placeholder: "",
       isMultiLine: false,
+      allowMultiple: false,
+      minFields: 1,
+      maxFields: 100,
     },
     audio: {
       enabled: false,
@@ -287,6 +336,11 @@ export default {
       question.followUp.text = ""
       question.followUp.questionId = ""
       question.followUp.nodeId = ""
+    },
+    disableList(question) {
+      if (!question.answerTypes.text.isMultiLine) {
+        question.answerTypes.text.allowMultiple = false
+      }
     },
   },
 }

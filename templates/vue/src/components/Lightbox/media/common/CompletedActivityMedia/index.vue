@@ -1,10 +1,17 @@
 <template>
   <b-container class="completed-activity-media">
     <b-row align-v="center" style="min-height:150px;">
-      <b-col v-if="type === 'text'" align-self="center">
+      <b-col v-if="type === 'text' && !isListTextType" align-self="center">
         <div class="text">
           {{ answerData }}
         </div>
+      </b-col>
+      <b-col v-if="type === 'text' && isListTextType">
+        <ol>
+          <li v-for="answer in answerData" :key="answer.index">
+            {{ answer }}
+          </li>
+        </ol>
       </b-col>
       <b-col v-if="type === 'audio'" align-self="center">
         <audio controls :src="urlAnswer"></audio>
@@ -53,6 +60,9 @@ export default {
       return (
         wpData.uploadDirArray.baseurl + "/" + this.answerData.url + "?" + Date.now()
       )
+    },
+    isListTextType() {
+      return this.question.answerTypes?.text.allowMultiple
     },
   },
   methods: {

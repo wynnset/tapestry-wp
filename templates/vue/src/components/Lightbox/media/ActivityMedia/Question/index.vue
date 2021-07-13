@@ -45,7 +45,7 @@
           <text-question
             v-if="formType === 'text'"
             :question="question"
-            :answer="answer"
+            :answer="answer ? answer : []"
             @submit="handleSubmit"
           ></text-question>
           <audio-recorder
@@ -135,6 +135,7 @@ export default {
       formOpened: false,
       formType: "",
       answers: {},
+      prevQuestionId: null,
     }
   },
   computed: {
@@ -154,6 +155,8 @@ export default {
           ) {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             this.question.followUp.nodeId = tempNodeId
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.prevQuestionId = this.question.followUp.questionId
           }
         }
       }
