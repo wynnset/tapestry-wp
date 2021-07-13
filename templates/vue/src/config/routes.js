@@ -54,6 +54,11 @@ const settings = {
   name: "settings",
 }
 
+const help = {
+  path: `${ROOT_PATH}/help`,
+  name: "help",
+}
+
 const modal = {
   path: `${ROOT_PATH}/:type/:tab`,
   name: "modal",
@@ -82,6 +87,7 @@ const routes = {
   settings,
   nestedMultiContent,
   redirects,
+  help,
 }
 
 export const names = Object.fromEntries(

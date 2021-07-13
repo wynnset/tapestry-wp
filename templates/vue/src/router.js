@@ -14,6 +14,7 @@ export const routes = [
   routeConfig.settings,
   ...routeConfig.redirects,
   routeConfig.modal,
+  routeConfig.help,
 ]
 
 const router = new VueRouter({

@@ -2,6 +2,7 @@
   <div class="toolbar">
     <tapestry-filter v-if="!showMap" style="z-index: 10;" />
     <div v-show="canEdit || (!showMap && hasDepth)" class="slider-wrapper">
+      <help-button v-if="canEdit"/>
       <review-notifications v-if="canEdit && settings.submitNodesEnabled" />
       <settings-modal-button
         v-if="canEdit"
@@ -22,6 +23,7 @@ import TapestryDepthSlider from "./TapestryDepthSlider"
 import SettingsModalButton from "./SettingsModalButton"
 import TapestryFilter from "./TapestryFilter"
 import ReviewNotifications from "./ReviewNotifications"
+import HelpButton from "./HelpButton"
 import * as wp from "@/services/wp"
 
 export default {
@@ -30,6 +32,7 @@ export default {
     TapestryFilter,
     SettingsModalButton,
     ReviewNotifications,
+    HelpButton,
   },
   data() {
     return {
