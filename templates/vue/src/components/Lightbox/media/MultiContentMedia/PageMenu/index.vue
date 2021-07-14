@@ -6,18 +6,18 @@
       :class="[
         'page-nav',
         {
-          lightbox: !node.fullscreen,
-          fullscreen: node.fullscreen,
+          lightbox: !isFullScreen,
+          fullscreen: isFullScreen,
           closed: !opened,
         },
       ]"
-      :style="{ height: node.fullscreen ? '100vh' : dimensions.height + 'px' }"
+      :style="{ height: isFullScreen ? '100vh' : dimensions.height + 'px' }"
     >
       <button
         :class="[
           'page-nav-toggle',
           {
-            fullscreen: node.fullscreen,
+            fullscreen: isFullScreen,
           },
         ]"
         data-qa="page-nav-toggle"
@@ -30,7 +30,7 @@
         :class="[
           'page-nav-content',
           {
-            fullscreen: node.fullscreen,
+            fullscreen: isFullScreen,
             closed: !opened,
           },
         ]"
@@ -74,6 +74,11 @@ export default {
       required: false,
       default: null,
     },
+    fullScreen: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -103,6 +108,9 @@ export default {
     },
     rowOrder() {
       return this.getRowOrder(this.node)
+    },
+    isFullScreen() {
+      return this.fullScreen || this.node.fullscreen
     },
   },
   mounted() {
@@ -160,6 +168,10 @@ export default {
 </script>
 
 <style lang="scss">
+.tyde-mode ~ .page-nav-wrapper > .page-nav {
+  padding-top: 8rem !important;
+}
+
 .page-nav-wrapper {
   .page-nav {
     position: relative;

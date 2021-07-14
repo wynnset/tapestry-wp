@@ -270,6 +270,62 @@ class TapestryApi {
       comments,
     })
   }
+
+  get cos() {
+    const client = this.client
+    const baseUrl = "/activities/cos"
+    return {
+      getActivity() {
+        return client.get(baseUrl).then(res => res.data)
+      },
+      saveActivity(circleOfSupport) {
+        return client.post(baseUrl, circleOfSupport).then(res => res.data)
+      },
+      deleteActivity() {
+        return client.delete(baseUrl).then(res => res.data)
+      },
+      addConnection(connection) {
+        return client
+          .post(`${baseUrl}/connections`, connection)
+          .then(res => res.data)
+      },
+      updateConnection(id, connection) {
+        return client
+          .put(`${baseUrl}/connections/${id}`, connection)
+          .then(res => res.data)
+      },
+      addConnectionToCommunity(communityId, connectionId) {
+        return client
+          .post(`${baseUrl}/communities/${communityId}`, { id: connectionId })
+          .then(res => res.data)
+      },
+      addCommunity(community) {
+        return client.post(`${baseUrl}/communities`, community).then(res => res.data)
+      },
+      updateCommunity(id, community) {
+        return client
+          .put(`${baseUrl}/communities/${id}`, community)
+          .then(res => res.data)
+      },
+      removeConnectionFromCommunity(communityId, connectionId) {
+        return client
+          .delete(
+            `${baseUrl}/communities/${communityId}/connections/${connectionId}`
+          )
+          .then(res => res.data)
+      },
+      addConnectionToCircle(circleIndex, connectionId) {
+        return client
+          .post(`${baseUrl}/circles/${circleIndex}`, { id: connectionId })
+          .then(res => res.data)
+      },
+      removeConnectionFromCircle(circleIndex, connectionId) {
+        return client
+          .delete(`${baseUrl}/circles/${circleIndex}/connections/${connectionId}`)
+          .then(res => res.data)
+      },
+    }
+  }
 }
 
 export default new TapestryApi(postId)

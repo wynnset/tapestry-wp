@@ -12,32 +12,42 @@
     :show-fav="!tydeModeEnabled"
     @close="handleUserClose"
   >
-    <navbar v-if="tydeModeEnabled" @change-tab="handleTabChange"></navbar>
-    <multi-content-media
-      v-if="node.mediaType === 'multi-content'"
-      :node="node"
-      :row-id="rowId"
-      :sub-row-id="subRowId"
-      @close="handleAutoClose"
-      @complete="complete"
-    />
-    <page-menu
-      v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
-      :node="node"
-      :rowRefs="rowRefs"
-      :dimensions="dimensions"
-    />
-    <tapestry-media
-      v-if="node.mediaType !== 'multi-content'"
-      :node-id="nodeId"
-      :dimensions="dimensions"
-      context="lightbox"
-      :class="{ 'tyde-mode': tydeModeEnabled }"
-      @load="handleLoad"
-      @close="handleAutoClose"
-      @complete="complete"
-      @change:dimensions="updateDimensions"
-    />
+    <navbar
+      v-if="tydeModeEnabled"
+      :selectedTab="selectedTab"
+      @change-tab="handleTabChange"
+    ></navbar>
+    <circle-of-support v-if="selectedTab === 'cos'" />
+
+    <template v-if="isNodeView">
+      <multi-content-media
+        v-if="node.mediaType === 'multi-content'"
+        :node="node"
+        :row-id="rowId"
+        :class="{ 'tyde-mode': tydeModeEnabled }"
+        :sub-row-id="subRowId"
+        @close="handleAutoClose"
+        @complete="complete"
+      />
+      <page-menu
+        v-if="node.typeData.showNavBar && node.presentationStyle === 'page'"
+        :node="node"
+        :rowRefs="rowRefs"
+        :dimensions="dimensions"
+        :full-screen="tydeModeEnabled"
+      />
+      <tapestry-media
+        v-if="node.mediaType !== 'multi-content'"
+        :node-id="nodeId"
+        :dimensions="dimensions"
+        context="lightbox"
+        :class="{ 'tyde-mode': tydeModeEnabled }"
+        @load="handleLoad"
+        @close="handleAutoClose"
+        @complete="complete"
+        @change:dimensions="updateDimensions"
+      />
+    </template>
   </tapestry-modal>
 </template>
 
@@ -53,6 +63,7 @@ import Helpers from "@/utils/Helpers"
 import { sizes } from "@/utils/constants"
 import DragSelectModular from "@/utils/dragSelectModular"
 import Navbar from "@/components/tyde/Navbar"
+import CircleOfSupport from "@/components/tyde/activities/CircleOfSupport"
 import { canEditTapestry } from "@/services/wp"
 
 export default {
@@ -63,6 +74,7 @@ export default {
     TapestryModal,
     PageMenu,
     Navbar,
+    CircleOfSupport,
   },
   props: {
     nodeId: {
@@ -88,7 +100,7 @@ export default {
       },
       showCompletionScreen: false,
       rowRefs: [],
-      selectedTab: "",
+      selectedTab: "default",
     }
   },
   computed: {
@@ -100,6 +112,9 @@ export default {
     },
     canSkip() {
       return this.node.completed || this.node.skippable !== false
+    },
+    isNodeView() {
+      return this.selectedTab === "default" ? true : false
     },
     tydeModeEnabled() {
       return !canEditTapestry() && this.settings.tydeModeEnabled
@@ -325,7 +340,6 @@ body.tapestry-lightbox-open {
 #lightbox {
   &.full-screen {
     background: #000;
-
     .close-btn {
       position: fixed;
       top: 50px;
@@ -336,6 +350,6 @@ body.tapestry-lightbox-open {
 }
 
 .tyde-mode {
-  padding-top: 3rem;
+  padding-top: 6rem;
 }
 </style>

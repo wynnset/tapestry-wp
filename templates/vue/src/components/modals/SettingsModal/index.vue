@@ -507,7 +507,8 @@ export default {
         */
       if (this.tydeModeEnabled) {
         this.roles.forEach(role => {
-          if (!this.tydeModeDefualtNodes[role]) {
+          const rolesDefualtNode = this.tydeModeDefualtNodes[role]
+          if (!rolesDefualtNode || !this.nodes[rolesDefualtNode]) {
             this.tydeModeDefualtNodes[role] = this.rootId
           }
         })

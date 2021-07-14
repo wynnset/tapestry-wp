@@ -310,8 +310,12 @@ button[disabled] {
 }
 
 .title {
-  color: #fff;
+  color: rgb(51, 51, 51);
   margin-bottom: 1em;
+}
+
+.tyde-mode .title {
+  text-align: left;
 }
 
 .media-container {

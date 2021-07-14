@@ -40,9 +40,9 @@ export default {
 <style lang="scss" scoped>
 .article {
   padding: 1em;
-  background: rgb(238, 238, 238);
   text-align: left;
   min-height: 100%;
+  background: rgb(238, 238, 238);
 
   h1 {
     font-size: 1.75rem;
@@ -64,6 +64,7 @@ export default {
 
 .page-style {
   padding: 0 !important;
+  background: #262626 !important;
 
   > h1 {
     margin-top: 0 !important;

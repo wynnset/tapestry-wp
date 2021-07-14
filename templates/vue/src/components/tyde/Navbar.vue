@@ -52,11 +52,11 @@ export default {
 
 <style lang="scss">
 .nav-container {
-  width: 100%;
+  width: 100vw;
   z-index: 9999;
   position: fixed !important;
   top: 40px;
-  left: auto;
+  left: 0;
 }
 .navbar {
   min-width: 250px;
